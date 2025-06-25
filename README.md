@@ -1,2 +1,2 @@
-# Open_Hardware
+# Open Hardware
 Repository dedicated to open hardwares
