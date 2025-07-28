@@ -11,6 +11,9 @@ Repo dedicated to DIY automated microscope
 - 1 mini breadboard
 - 1 5 Volts source
 - 2 Glass slides
+- 1 470 uF capacitor
+- 4 M2.5 10 mm screws
+- 4 M2.5 nuts
 
 3- Results:
 3.1 - The box
