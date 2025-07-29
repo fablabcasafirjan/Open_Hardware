@@ -1,4 +1,7 @@
 # Open Hardware
+
+![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
+
 Repository dedicated to open hardwares
 
 ## Star History
