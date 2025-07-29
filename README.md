@@ -1,6 +1,6 @@
 # Open Hardware
 
-![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)   [![License: MIT](https://img.shields.io/badge/License-CC--MIT-lightgrey.svg)](./LICENSE)
+![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg) 
 
 Repository dedicated to open hardwares
 
