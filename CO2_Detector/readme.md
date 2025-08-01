@@ -1,6 +1,6 @@
 Repo dedicated to DIY CO² Detector
 
-1. Introduction: 
+1. Introduction:   
 
 
 2. Materials needed to build:
