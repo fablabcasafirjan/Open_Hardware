@@ -1,3 +1,4 @@
+# Ao invés do copo de plástico poderia ser um béquer ou um copo com as laterais retas.
 Repo dedicated to DIY Turbidimeter V1
 
 1. Introduction: 
