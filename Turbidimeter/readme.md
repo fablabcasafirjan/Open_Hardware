@@ -1,5 +1,4 @@
-# Ao invés do copo de plástico poderia ser um béquer ou um copo com as laterais retas.
-Repo dedicated to DIY Turbidimeter V1
+# Repo dedicated to DIY Turbidimeter V1
 
 1. Introduction: 
 
@@ -16,4 +15,9 @@ Repo dedicated to DIY Turbidimeter V1
 3.1 - The box:
 
 3.2 - Turbidity results:
+
+
+Suggestions: 
+
+- Instead of the plastic cup, it could be a beaker or a cup with straight sides.
 
