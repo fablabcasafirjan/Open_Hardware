@@ -21,13 +21,14 @@
 #include <WiFi.h>
 #include <HTTPClient.h>
 
-const char* ssid = "AndroidAP";
-const char* password = "fablab123";
+/Internet
+const char* ssid = "Your_Login_Network";
+const char* password = "Your_network_Password";
 
-//token do bot
-const String botToken = "8180719326:AAF8sh6Ofp7S13EOzP3xdzLWvV1NHN7oelY";
+//token do bot in telegram
+const String botToken = "Your_Bot_Token";
 //id do chat do telegram
-const String chatId = "-1002577973734";
+const String chatId = "Your_chat_ID";
 
 // URL base para a API do Telegram
 const String telegramApiBase = "https://api.telegram.org/bot";
