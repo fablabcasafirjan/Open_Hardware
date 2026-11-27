@@ -21,15 +21,15 @@
 #include <Adafruit_SSD1306.h>
 #include <WiFi.h>
 #include <HTTPClient.h>
-#include "secrets.h"
 
-const char* ssid = WIFI_SSID;
-const char* password = WIFI_PASSWORD;
+// >>> TROQUE pelos seus dados antes de carregar. Não publique o sketch com os dados reais. <<<
+const char* ssid = "TROQUE_PELO_NOME_DA_REDE";
+const char* password = "TROQUE_PELA_SENHA_DO_WIFI";
 
 //token do bot
-const char* botToken = TELEGRAM_BOT_TOKEN;
+const char* botToken = "TROQUE_PELO_TOKEN_DO_BOT";
 //id do chat do telegram
-const char* chatId = TELEGRAM_CHAT_ID;
+const char* chatId = "TROQUE_PELO_ID_DO_CHAT";
 
 // URL base para a API do Telegram
 const String telegramApiBase = "https://api.telegram.org/bot";
@@ -76,6 +76,22 @@ void showWifiCountdown(int segundos) {
   display.display();
 }
 
+// Mostra no OLED o resultado da checagem de inicialização
+void showStartupCheck(bool monitorOk) {
+  display.clearDisplay();
+  display.setTextColor(SSD1306_WHITE);
+  display.setTextSize(1);
+  display.setCursor(0, 0);
+  display.print("Inicializacao");
+  display.setCursor(0, 18);
+  display.print("Display: OK");
+  display.setCursor(0, 32);
+  display.print(monitorOk ? "Monitor CO2: OK" : "Monitor CO2: FALHA");
+  display.setCursor(0, 46);
+  display.print(WiFi.status() == WL_CONNECTED ? "WiFi: OK" : "WiFi: offline");
+  display.display();
+}
+
 void setup() {
   // inicia a serial do terminal; a do SenseAir S8 é iniciada mais abaixo
   Serial.begin(DEBUG_BAUDRATE);
@@ -86,6 +102,9 @@ void setup() {
     for (;;)
       ;  // Don't proceed, loop forever
   }
+  // begin() não percebe um display ausente; a resposta no endereço I2C confirma a ligação
+  Wire.beginTransmission(SCREEN_ADDRESS);
+  Serial.println(Wire.endTransmission() == 0 ? "Display: OK" : "Display: FALHA (sem resposta no I2C)");
 
   Serial.print("Conectando a ");
   Serial.println(ssid);
@@ -98,13 +117,13 @@ void setup() {
   }
 
   if (WiFi.status() == WL_CONNECTED) {
-    Serial.println("WiFi conectado!");
+    Serial.println("WiFi: OK");
     Serial.print("Endereço IP: ");
     Serial.println(WiFi.localIP());
     // Envia uma mensagem de teste logo após conectar
     sendMessageToTelegram("ESP32 conectado e pronto!");
   } else {
-    Serial.println("Sem WiFi: medindo offline.");
+    Serial.println("WiFi: offline. Medindo sem rede.");
   }
 
 
@@ -124,9 +143,14 @@ void setup() {
   sensor_S8->get_firmware_version(sensor.firm_version);
   int len = strlen(sensor.firm_version);
   if (len == 0) {
-    Serial.println("Sensor de CO2 SenseAir S8 não foi encontrado!");
+    Serial.println("Monitor CO2: FALHA (SenseAir S8 não foi encontrado)");
+    showStartupCheck(false);
     while (1) { delay(1); };  // pausa para sempre - não sai daqui sem reset
   }
+
+  Serial.println("Monitor CO2: OK");
+  showStartupCheck(true);
+  delay(3000);  // tempo para ler a checagem no display
 
   // Informações iniciais do SenseAir S8
   Serial.println(">>> SenseAir S8 NDIR CO2 sensor <<<");

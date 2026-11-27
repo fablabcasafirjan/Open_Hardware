@@ -25,13 +25,15 @@
 
 Um LED ilumina por baixo um recipiente com a amostra, dentro de uma caixa de MDF. Uma câmera registra como a luz atravessa a amostra. Não há microcontrolador.
 
-### 🧪 Como é usado
+### 🧪 Como medir
 
-1. A amostra fica no recipiente, sobre a abertura iluminada pelo LED.
-2. A câmera do celular, ou outra câmera, registra a imagem.
-3. As imagens de amostras diferentes podem ser comparadas.
+1. Fixe o **foco** e o **brilho** da câmera.
+2. Apoie a câmera em cima do turbidímetro, apontada para baixo pelo furo da tampa.
+3. Com o LED ligado, coloque a amostra sobre o furo iluminado.
+4. Fotografe. Troque a amostra e repita, sem mudar a posição nem os ajustes da câmera.
+5. Em cada foto, meça o **brilho** e a **saturação** dos pixels que mostram a amostra, na área por onde a luz passou.
 
-Esta é uma descrição geral. Geometria, posição da câmera, preparo das amostras e análise não estão padronizados.
+Cada participante montou o próprio turbidímetro, com variações, como parte da experimentação.
 
 ### 📊 Observações registradas
 
@@ -41,32 +43,30 @@ Captura de tela com histogramas de intensidade de pixels. O nome do arquivo indi
 
 ### ⚠️ Limitações conhecidas
 
-- Sem sequência de montagem, geometria ou posição da câmera documentadas.
-- Sem procedimento de medição, calibração ou dados de repetibilidade.
-- Ajustes automáticos de câmeras de celular podem alterar as imagens e não foram tratados.
+- Sem calibração, valores em NTU ou dados de repetibilidade.
 
 ---
 
 ## 🛠️ Ferramentas e processos
 
-| Etapa | Ferramenta | Observação |
-| --- | --- | --- |
-| Caixa | Peças de MDF encaixadas | Processo e parâmetros de corte **a confirmar** |
-| Registro | Câmera de celular, webcam ou equivalente | Lista original |
-| Análise | **A confirmar** | A captura de tela mostra janelas de histograma |
+| Etapa | Ferramenta |
+| --- | --- |
+| Corte do MDF | Cortadora a laser CO₂ de 80 W (marca e modelo a confirmar) |
+| Registro | Câmera de celular, webcam ou equivalente, com foco e brilho fixos |
+| Análise | Brilho e saturação dos pixels da amostra |
 
 ---
 
 ## 🧾 Lista de materiais
 
-| Item | Qtd. | Especificação | Origem da informação |
-| --- | :---: | --- | --- |
-| Chapa de MDF | 1 | 3 mm | Lista original |
-| LED | 1 | 10 mm (vermelho nas fotos) | Lista original e fotos |
-| Bateria | 1 | CR2032, 3 V | Lista original |
-| Material difusor | 1 | Folha A4 ou equivalente | Lista original |
-| Câmera | 1 | Celular, webcam ou equivalente | Lista original |
-| Recipiente de amostra | — | Copo plástico ou placa; modelo não registrado | Fotos e nome do arquivo de resultados, **a confirmar** |
+| Item | Qtd. | Especificação |
+| --- | :---: | --- |
+| Chapa de MDF | 1 | 3 mm |
+| LED | 1 | 10 mm (vermelho nas fotos) |
+| Bateria | 1 | CR2032, 3 V |
+| Material difusor | 1 | Folha A4 ou equivalente |
+| Câmera | 1 | Celular, webcam ou equivalente |
+| Recipiente de amostra | — | Copo plástico ou placa de Petri |
 
 Sugestão registrada no projeto de origem: no lugar do copo plástico, usar um béquer ou um copo de paredes retas.
 
@@ -82,19 +82,14 @@ Não usa firmware. Não há nada para abrir na Arduino IDE.
 
 ---
 
-## 🧰 Como reproduzir
-
-Não há procedimento completo. O acervo permite ver a construção geral nas fotos e consultar a lista de materiais. Antes de reproduzir medições, é preciso definir e documentar geometria, aquisição, amostras e calibração.
-
 ## 🚦 Status
 
 | Verificação | Situação |
 | --- | --- |
-| Montagem documentada passo a passo | **Não** |
 | Calibração e valores em NTU | **Não há** |
 | Repetibilidade | **Não avaliada** |
 
-**Próximos passos:** confirmar o conteúdo de `Turbd_V1.png` e publicar o desenho de corte, se existir; documentar montagem e medição; calibrar com padrões antes de apresentar resultados quantitativos.
+**Próximos passos:** repetir medições da mesma amostra e calibrar com padrões antes de apresentar resultados quantitativos.
 
 ---
 
@@ -110,11 +105,14 @@ Não há procedimento completo. O acervo permite ver a construção geral nas fo
 
 ## 🗂️ Arquivos
 
-- [Turbd_V1.png](Turbd_V1.png): imagem de 15118 × 15118 pixels com traços muito claros e algumas marcas vermelhas; parece um desenho de peças, **a confirmar**. Por ser muito grande, não é exibida aqui.
+- [Turbd_V0.1.0.png](Turbd_V0.1.0.png): imagem de 15118 × 15118 pixels com traços muito claros e algumas marcas vermelhas; parece um desenho de peças, **a confirmar**. Por ser muito grande, não é exibida aqui.
 
 ## 👥 Créditos
 
-Projeto do bootcamp do [FabLab Casa Firjan](https://github.com/fablabcasafirjan/Open_Hardware). Fotos em `fotos/`: acervo do bootcamp, de pasta compartilhada por Willian.
+- Projeto do bootcamp do [FabLab Casa Firjan](https://github.com/fablabcasafirjan/Open_Hardware).
+- Planejamento dos equipamentos: **Willian Barela**, **João Victor Dutra** ([JVSDutra](https://github.com/JVSDutra)) e **Ricardo Michel**.
+- Construção: **João Victor Dutra**, em consulta com Willian e Michel.
+- Fotos em `fotos/`: **Casa Firjan**.
 
 ## 📄 Licença
 

@@ -1,9 +1,10 @@
 <div align="center">
 
-# Incubadora (também serve de estufa)
+# Incubadora/Estufa V1
 
 **Câmara aquecida didática em MDF e acrílico, com Arduino UNO e sensor DS18B20**
 
+![Projeto](https://img.shields.io/badge/projeto-V1-informational?style=flat)
 ![Placa](https://img.shields.io/badge/placa-Arduino%20UNO-00878F?style=flat&logo=arduino&logoColor=white)
 ![IDE](https://img.shields.io/badge/firmware-Arduino%20IDE-00878F?style=flat)
 ![Linguagem](https://img.shields.io/badge/linguagem-C%2B%2B-blue?style=flat&logo=c%2B%2B&logoColor=white)
@@ -21,25 +22,24 @@
 </div>
 
 > [!WARNING]
-> **Não ligue a lâmpada à rede sem uma proteção térmica independente e sem validar o circuito. Não deixe o equipamento ligado sem supervisão.** Este aviso não substitui essas proteções. O equipamento usa uma lâmpada de 250 W na rede elétrica, e a segurança não foi validada. Pela leitura do código:
-> - o sketch trata `LOW` como lâmpada ligada, e o pino do relé começa em `LOW` ao energizar;
-> - com o DS18B20 desconectado, a biblioteca retorna -127 °C, e o sketch **liga ou mantém ligada** a lâmpada;
-> - não há limite máximo para a temperatura alvo nem desligamento de proteção.
+> **O equipamento usa uma lâmpada de 250 W na rede elétrica, e a segurança não foi validada. Não ligue a lâmpada à rede sem uma proteção térmica independente e sem validar o circuito. Não deixe o equipamento ligado sem supervisão.** A montagem na rede elétrica deve ser feita por pessoa habilitada.
 >
-> Os próprios comentários do código pedem para conferir a polaridade do relé no circuito real. A montagem na rede elétrica deve ser feita por pessoa habilitada.
+> **Antes da primeira ligação, com a lâmpada fora da rede, confira a polaridade do relé.** O sketch considera que o relé liga com `LOW` e desliga com `HIGH`. Há relés que funcionam ao contrário: nesse caso, a lâmpada ligaria justamente quando deveria desligar. Se for o seu, inverta `RELE_LIGADO` e `RELE_DESLIGADO` no sketch. Entre a energização e o início do programa, o estado do relé depende só do circuito.
 
 ---
 
 ## 📖 Visão geral
 
-A câmara tem uma lâmpada de aquecimento, um ventilador, um sensor de temperatura, um LCD e dois botões. Serve como incubadora e também como estufa.
+A câmara tem uma lâmpada de aquecimento, um ventilador, um sensor de temperatura, um LCD e dois botões.
 
 ### 🧪 Como funciona
 
-1. O DS18B20 mede a temperatura, e o LCD mostra a leitura e o valor alvo.
-2. Os botões diminuem ou aumentam o alvo em passos de 0,5 °C.
-3. O sketch liga a lâmpada abaixo de `alvo − 0,5 °C` e a desliga ao atingir o alvo (controle liga/desliga com histerese).
-4. O ventilador fica em PWM 255 ao aquecer e passa a 122 quando a lâmpada é desligada.
+1. Ao iniciar, o relé é colocado em `HIGH` (lâmpada desligada).
+2. O DS18B20 mede a temperatura, e o LCD mostra a leitura e o valor alvo.
+3. Os botões, com *debounce*, mudam o alvo em passos de 0,5 °C; mantidos pressionados, repetem. O alvo vai até **60 °C**.
+4. O sketch liga a lâmpada abaixo de `alvo − 0,5 °C` e a desliga ao atingir o alvo (controle liga/desliga com histerese).
+5. O ventilador fica em PWM 255 ao aquecer e passa a 122 quando a lâmpada é desligada.
+6. Se o DS18B20 for desconectado ou a leitura for inválida, a lâmpada é desligada, o ventilador vai a 255 e o LCD mostra **ERRO NO SENSOR**. O controle volta quando a leitura volta.
 
 ### 📊 Entradas e saídas
 
@@ -53,19 +53,13 @@ A câmara tem uma lâmpada de aquecimento, um ventilador, um sensor de temperatu
 
 ### ⚠️ Limitações conhecidas
 
-- Os pontos de segurança do aviso acima.
-- Botões sem tratamento de repique (*debounce*).
-- O LCD não limpa os caracteres que sobram quando o número exibido fica mais curto.
-- Sem ensaio documentado de estabilidade, uniformidade ou faixa de temperatura.
-- Sem esquema elétrico nem sequência de montagem.
+- Falta o ensaio térmico: estabilidade, uniformidade e faixa de temperatura não foram medidas.
+- Falta publicar o esquema elétrico e a sequência de montagem.
+- O limite de 60 °C vale para o **alvo**. A temperatura medida pode passar dele, e o limite não é uma proteção térmica.
+- A falha detectada é a de leitura ausente ou fora da faixa do sensor. Um sensor mal posicionado ou com leitura errada, mas plausível, não é percebido.
 
 ### 🛡️ Sugestões de segurança (ainda não implementadas)
 
-São recomendações para revisar antes de usar o equipamento. O firmware não as aplica, porque a polaridade do relé precisa ser confirmada no circuito real.
-
-- Garantir que o relé fique **desligado** ao energizar e durante a reinicialização da placa, no firmware e no circuito.
-- Desligar a lâmpada e sinalizar o erro quando a leitura do sensor for inválida (por exemplo, -127 °C) ou estiver fora de uma faixa plausível.
-- Limitar a temperatura alvo a um mínimo e um máximo definidos em ensaio.
 - Instalar uma proteção térmica **independente do Arduino** (termostato de segurança ou fusível térmico), pois um relé de estado sólido pode falhar fechado.
 - Prever fusível, aterramento, isolamento das partes ligadas à rede e distância entre a lâmpada e materiais inflamáveis, como o MDF.
 
@@ -73,38 +67,38 @@ São recomendações para revisar antes de usar o equipamento. O firmware não a
 
 ## 🛠️ Ferramentas e processos
 
-| Etapa | Ferramenta | Observação |
-| --- | --- | --- |
-| Desenho das peças | Inkscape | Registrado nos metadados do SVG |
-| Estrutura | Peças de MDF e acrílico | Desenho no SVG; parâmetros de corte não registrados |
-| Dobradiças | Impressão 3D em PLA | Lista original |
-| Firmware | Arduino IDE | Um sketch |
+| Etapa | Ferramenta |
+| --- | --- |
+| Desenho das peças | Inkscape |
+| Corte do MDF e do acrílico | Cortadora a laser CO₂ de 80 W (marca e modelo a confirmar) |
+| Dobradiças em PLA | Impressora 3D Bambu Lab A1 |
+| Firmware | Arduino IDE |
 
 ---
 
 ## 🧾 Lista de materiais
 
-| Item | Qtd. | Especificação | Origem da informação |
-| --- | :---: | --- | --- |
-| Chapa de MDF | 1 | 6 mm | Lista original |
-| Chapa de MDF | 1 | 3 mm | Lista original |
-| Chapa de acrílico | 1 | 3 mm | Lista original |
-| Arduino UNO | 1 | — | Lista original |
-| Sensor de temperatura | 1 | DS18B20 | Lista original |
-| LCD | 1 | 16 × 2 | Lista original |
-| Trimpot | 1 | 10 kΩ | Lista original |
-| Botões | 2 | Amarelo e azul nas fotos | Lista original e fotos |
-| Lâmpada de aquecimento | 1 | 250 W | Lista original |
-| Relé de estado sólido | 1 | Modelo não registrado | Lista original |
-| Ventilador | 1 | 12 V, 8 × 8 cm | Lista original |
-| Fonte | 1 | 7 V | Lista original. Como o ventilador listado é de 12 V, a alimentação está **a confirmar** |
-| Extensão com tomada | 1 | — | Lista original |
-| Protoboard | 1 | — | Lista original |
-| Jumpers | — | Quantidade não registrada | Lista original |
-| Dobradiças | 2 | PLA impresso em 3D | Lista original |
-| Parafusos | 2 | M2 × 12 mm | Lista original |
-| Folha de alumínio | 1 | — | Lista original |
-| Soquete da lâmpada e módulo com bornes | — | Modelos não identificados | Vistos nas fotos, **a confirmar** |
+| Item | Qtd. | Especificação |
+| --- | :---: | --- |
+| Chapa de MDF | 1 | 6 mm |
+| Chapa de MDF | 1 | 3 mm |
+| Chapa de acrílico | 1 | 3 mm |
+| Arduino UNO | 1 | — |
+| Sensor de temperatura | 1 | DS18B20 |
+| LCD | 1 | 16 × 2 |
+| Trimpot | 1 | 10 kΩ |
+| Botões | 2 | Amarelo e azul nas fotos |
+| Lâmpada de aquecimento | 1 | 250 W |
+| Relé de estado sólido | 1 | Modelo não registrado |
+| Ventilador | 1 | 12 V, 8 × 8 cm |
+| Fonte | 1 | 7 V |
+| Extensão com tomada | 1 | — |
+| Protoboard | 1 | — |
+| Jumpers | — | Quantidade não registrada |
+| Dobradiças | 2 | PLA impresso em 3D |
+| Parafusos | 2 | M2 × 12 mm |
+| Folha de alumínio | 1 | — |
+| Soquete da lâmpada e módulo com bornes | — | Modelos não registrados |
 
 ---
 
@@ -132,7 +126,7 @@ A tabela não é um esquema elétrico: alimentação, acionamento do ventilador,
 
 ## 💻 Firmware
 
-[Incubator_Bootcamp_V1.ino](Incubator_Bootcamp_V1/Incubator_Bootcamp_V1.ino), versão **1.0.1** ([changelog](../CHANGELOG.md)). O comentário do código o chama de "Incubadora V03".
+[Incubator_Bootcamp_V1.ino](Incubator_Bootcamp_V1/Incubator_Bootcamp_V1.ino), versão **1.0.1** ([changelog](../CHANGELOG.md)).
 
 | Biblioteca ou pacote | Versão usada na compilação |
 | --- | --- |
@@ -151,20 +145,23 @@ Não são necessariamente as versões da montagem original.
 2. Em **Ferramentas > Placa**, escolha **Arduino Uno**.
 3. Pelo Gerenciador de Bibliotecas, instale `LiquidCrystal`, `OneWire` e `DallasTemperature`.
 4. Use **Verificar** para compilar.
-5. Antes de carregar, leia o aviso acima e confira o circuito. Faça os primeiros testes de lógica com a lâmpada desconectada da rede.
-6. No Monitor Serial, use 9600 baud. Os botões são lidos uma vez por ciclo, e a leitura do sensor em 12 bits leva cerca de 0,75 s; mantenha o botão pressionado até o valor mudar.
-7. O botão de aumentar usa o pino 13, ligado ao LED da própria placa. Em algumas placas, isso pode fazer o pino ler `LOW` com o botão solto. Confira se a temperatura alvo não sobe sozinha.
+5. Com a **lâmpada fora da rede**, carregue o sketch e confira, com um multímetro ou pelo LED do módulo, se o relé fica desligado ao iniciar (aviso no topo).
+6. No Monitor Serial, em 9600 baud, confira a leitura. Desconecte o DS18B20: o LCD deve mostrar **ERRO NO SENSOR**, e o relé, ficar desligado.
+7. Teste os botões: um toque muda 0,5 °C, e o alvo para em 60 °C.
+8. O botão de aumentar usa o pino 13, ligado ao LED da própria placa. Em algumas placas, isso pode fazer o pino ler `LOW` com o botão solto. Confira se a temperatura alvo não sobe sozinha.
 
 ## 🚦 Status
 
 | Verificação | Situação |
 | --- | --- |
-| Compilação (26/11/2026, arduino-cli) | Feita |
-| Teste em placa desta versão | **Não feito** |
-| Ensaio térmico documentado | **Não há** |
+| Compilação (27/11/2026, arduino-cli) | Feita |
+| Simulação do firmware 1.0.1 num ATmega328 virtual, sem sensor (27/11/2026) | Relé sempre desligado; botões, *debounce* e limite de 60 °C conferidos |
+| Controle com leitura de temperatura válida na versão 1.0.1 | **Não testado** |
+| Teste em placa da versão 1.0.1 | **Não feito** |
+| Ensaio térmico | **Falta fazer** |
 | Segurança elétrica e térmica | **Não validada** |
 
-**Próximos passos:** registrar o esquema elétrico e o modelo do relé; confirmar a polaridade; revisar estado inicial, falha do sensor e limites; documentar a montagem e um ensaio térmico.
+**Próximos passos:** confirmar a polaridade do relé na montagem, testar a versão 1.0.1 em placa, publicar o esquema elétrico e a sequência de montagem e fazer o ensaio térmico.
 
 ---
 
@@ -174,7 +171,9 @@ Não são necessariamente as versões da montagem original.
 | --- | --- |
 | <img src="fotos/incubadora-lcd-botoes.jpg" alt="LCD mostrando temperatura e temperatura alvo, com botões amarelo e azul" width="300"> | <img src="fotos/incubadora-lampada.jpg" alt="Lâmpada de aquecimento sobre a folha de alumínio" width="300"> |
 
-O LCD da foto mostra um alvo de 60 °C. O firmware não impõe limite máximo.
+<img src="fotos/incubadora-imagem-termica.jpg" alt="Imagem térmica da incubadora, com a região da porta mais quente e uma mão à frente" width="420">
+
+A imagem térmica é só um exemplo: não tem escala de temperatura e não substitui um ensaio térmico.
 
 | Fechada | Aberta | Ligada |
 | --- | --- | --- |
@@ -185,11 +184,14 @@ O LCD da foto mostra um alvo de 60 °C. O firmware não impõe limite máximo.
 | Arquivo | Conteúdo |
 | --- | --- |
 | [Sketch](Incubator_Bootcamp_V1/Incubator_Bootcamp_V1.ino) | Firmware 1.0.1 |
-| [Incubadora_V06_Organizado.svg](Incubadora_V06_Organizado.svg) | Desenho das peças da caixa |
+| [Incubadora_V0.6.0_Organizado.svg](Incubadora_V0.6.0_Organizado.svg) | Desenho das peças da caixa (revisão V0.6.0) |
 
 ## 👥 Créditos
 
-Projeto do bootcamp do [FabLab Casa Firjan](https://github.com/fablabcasafirjan/Open_Hardware). Fotos em `fotos/`: acervo do bootcamp, de pasta compartilhada por Willian.
+- Projeto do bootcamp do [FabLab Casa Firjan](https://github.com/fablabcasafirjan/Open_Hardware).
+- Planejamento dos equipamentos: **Willian Barela**, **João Victor Dutra** ([JVSDutra](https://github.com/JVSDutra)) e **Ricardo Michel**.
+- Construção: **João Victor Dutra**, em consulta com Willian e Michel.
+- Fotos em `fotos/`: **Casa Firjan**.
 
 ## 📄 Licença
 
@@ -197,4 +199,4 @@ MIT, a mesma do repositório original ([LICENSE](../LICENSE)). Veja [créditos](
 
 ## English summary
 
-Educational incubator, also used as a warm lab cabinet: Arduino UNO, DS18B20, LCD, 250 W heat lamp and fan. The sketch compiles but this version was not tested on hardware. **Do not leave it unattended:** thermal safety is not validated, and a disconnected sensor turns the lamp on or keeps it on.
+Educational incubator / warm cabinet (V1): Arduino UNO, DS18B20, LCD, 250 W heat lamp and fan. Firmware 1.0.1 starts with the lamp off, turns it off if the sensor reading fails, caps the target at 60 °C and debounces the buttons. It compiles and was partly checked in an AVR simulator, not on hardware. **Check the relay polarity with the lamp disconnected from mains, and do not leave it unattended:** thermal safety is not validated.

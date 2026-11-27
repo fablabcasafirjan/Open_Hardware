@@ -1,5 +1,5 @@
 /*********
-  Versão do firmware: 1.0.3
+  Versão do firmware: 1.0.1
 
   Rui Santos & Sara Santos - Random Nerd Tutorials
   Complete instructions at https://RandomNerdTutorials.com/esp32-cam-projects-ebook/
@@ -17,11 +17,10 @@
 #include "soc/rtc_cntl_reg.h"    // disable brownout problems
 #include "esp_http_server.h"
 #include <ESP32Servo.h>
-#include "secrets.h"
 
-// Replace with your network credentials
-const char* ssid = WIFI_SSID;
-const char* password = WIFI_PASSWORD;
+// >>> TROQUE pelos seus dados antes de carregar. Não publique o sketch com os dados reais. <<<
+const char* ssid = "TROQUE_PELO_NOME_DA_REDE";
+const char* password = "TROQUE_PELA_SENHA_DO_WIFI";
 
 #define PART_BOUNDARY "123456789000000000000987654321"
 
