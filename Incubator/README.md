@@ -5,7 +5,7 @@
 Protótipo didático em MDF e acrílico com Arduino UNO, sensor DS18B20, LCD, dois botões, lâmpada de aquecimento e ventilador. Serve como incubadora e também como estufa. O sketch liga e desliga a lâmpada por histerese e ajusta o ventilador.
 
 > [!WARNING]
-> **Não deixe o equipamento ligado sem supervisão.** Ele usa uma lâmpada de 250 W na rede elétrica, e a segurança não foi validada. Pela leitura do código:
+> **Não ligue a lâmpada à rede sem uma proteção térmica independente e sem validar o circuito. Não deixe o equipamento ligado sem supervisão.** Este aviso não substitui essas proteções. O equipamento usa uma lâmpada de 250 W na rede elétrica, e a segurança não foi validada. Pela leitura do código:
 > - o sketch trata `LOW` como lâmpada ligada, e o pino do relé começa em `LOW` ao energizar;
 > - com o DS18B20 desconectado, a biblioteca retorna -127 °C, e o sketch **liga ou mantém ligada** a lâmpada;
 > - não há limite máximo para a temperatura alvo nem desligamento de proteção.
@@ -71,7 +71,8 @@ A tabela não é um esquema elétrico: alimentação, acionamento do ventilador,
 3. Pelo Gerenciador de Bibliotecas, instale `LiquidCrystal`, `OneWire` e `DallasTemperature`.
 4. Use **Verificar** para compilar.
 5. Antes de carregar, leia o aviso acima e confira o circuito. Faça os primeiros testes de lógica com a lâmpada desconectada da rede.
-6. No Monitor Serial, use 9600 baud. A temperatura alvo inicial é 37,5 °C, com histerese de 0,5 °C. Cada ciclo com um botão pressionado muda o alvo em 0,5 °C.
+6. No Monitor Serial, use 9600 baud. A temperatura alvo inicial é 37,5 °C, com histerese de 0,5 °C. Os botões são lidos uma vez por ciclo, e a leitura do sensor em 12 bits leva cerca de 0,75 s; mantenha o botão pressionado até o valor mudar. Cada ciclo com o botão pressionado muda o alvo em 0,5 °C.
+7. O botão de aumentar usa o pino 13, ligado ao LED da própria placa. Em algumas placas, isso pode fazer o pino ler `LOW` com o botão solto. Confira se a temperatura alvo não sobe sozinha.
 
 **Compilação verificada em 26/11/2026** (arduino-cli, `arduino:avr` 1.8.7, LiquidCrystal 1.0.7, OneWire 2.3.8, DallasTemperature 4.0.6). Não são necessariamente as versões da montagem original. Não houve teste em placa.
 
@@ -79,6 +80,7 @@ A tabela não é um esquema elétrico: alimentação, acionamento do ventilador,
 
 - Os pontos de segurança do aviso acima.
 - Botões sem tratamento de repique (*debounce*).
+- O LCD não limpa os caracteres que sobram quando o número exibido fica mais curto.
 - Sem ensaio documentado de estabilidade, uniformidade ou faixa de temperatura.
 - Sem esquema elétrico nem sequência de montagem.
 

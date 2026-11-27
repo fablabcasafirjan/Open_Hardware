@@ -52,13 +52,16 @@ Não há esquema elétrico; a posição do capacitor e a alimentação dos servo
 
 ## Limitações
 
-- A página e os comandos **não têm autenticação**; use apenas em rede confiável e não exponha à internet.
+- **Possível conflito entre servos e câmera, não testado em placa:** com ESP32Servo 3.2.0, os servos recebem os canais PWM 0 e 1 (timer 0), e depois o sketch configura a câmera no canal 0 e no timer 0. Os servos podem não se mover corretamente.
+- A página, o vídeo e os comandos **não têm autenticação**: qualquer aparelho com acesso à mesma rede pode ver a imagem e mover os servos. Use apenas em rede confiável e não exponha à internet.
+- Se a câmera não iniciar, o sketch encerra a inicialização antes de ligar o Wi-Fi; o erro aparece só no Monitor Serial.
 - O sketch desativa o detector de queda de tensão (*brownout*) da ESP32.
 - O firmware limita os comandos a 0–180 graus; o curso mecânico seguro da montagem não está documentado.
 - Sem sequência de montagem, ajuste óptico ou calibração.
 
 ## Próximos passos
 
+- Testar os servos com a câmera ativa e, se o conflito se confirmar, reservar outro timer para eles.
 - Registrar o esquema elétrico, a montagem e o ajuste óptico.
 - Medir o curso seguro dos servos na estrutura.
 - Fotografar o equipamento montado e documentar as condições das imagens.

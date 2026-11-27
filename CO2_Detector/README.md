@@ -46,7 +46,7 @@ Isso não é um esquema elétrico completo: alimentação e níveis de tensão n
 ## Usar na Arduino IDE
 
 1. Instale o pacote de placas **esp32** (Espressif Systems) e escolha **ESP32 Dev Module**.
-2. Instale **EspSoftwareSerial 8.1.0** (Dirk Kaar, Peter Lerup), **Adafruit GFX Library** e **Adafruit SSD1306** (com a dependência Adafruit BusIO).
+2. Pelo Gerenciador de Bibliotecas, instale **EspSoftwareSerial 8.1.0** (Dirk Kaar, Peter Lerup), **Adafruit GFX Library** e **Adafruit SSD1306** (com a dependência Adafruit BusIO).
 3. Instale **S8_UART 1.0.2** (Josep Comas): baixe o ZIP da tag `v1.0.2` em [jcomas/S8_UART](https://github.com/jcomas/S8_UART/tree/v1.0.2) e use **Sketch > Incluir Biblioteca > Adicionar biblioteca .ZIP**.
 4. Escolha um dos dois sketches da tabela e abra o `.ino`.
 5. Na pasta dele, copie `secrets.h.example` para `secrets.h` e preencha a cópia local com a rede, o token do bot e o ID do chat. A versão offline também precisa do arquivo para compilar.
@@ -57,7 +57,9 @@ Isso não é um esquema elétrico completo: alimentação e níveis de tensão n
 ## Limitações
 
 - Leituras não aferidas neste repositório.
-- Se o S8 não responder na inicialização, o sketch para até a placa ser reiniciada. Falhas durante a medição não são tratadas.
+- Se o S8 ou o OLED não responderem na inicialização, o sketch para até a placa ser reiniciada. Falhas durante a medição não são tratadas.
+- **A conexão com o Telegram não valida o certificado do servidor.** No core `esp32` 3.3.8, `http.begin(url)` sem certificado desativa essa verificação. Quem conseguir interceptar o tráfego pode obter o token do bot; use apenas em rede confiável e com um bot exclusivo para este protótipo.
+- Na versão offline, a mensagem "ESP32 conectado e pronto!" em geral não é enviada, porque é tentada antes de o Wi-Fi conectar. A primeira leitura é tentada cerca de 30 segundos depois da inicialização.
 - O envio ao Telegram acontece dentro do ciclo de medição e pode atrasar a atualização do display.
 - O nome da rede é impresso no Monitor Serial. `secrets.h` fica em texto puro no computador, e os valores são gravados na placa.
 
