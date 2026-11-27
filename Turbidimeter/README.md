@@ -27,13 +27,18 @@ Um LED ilumina por baixo um recipiente com a amostra, dentro de uma caixa de MDF
 
 ### 🧪 Como medir
 
-1. Fixe o **foco** e o **brilho** da câmera.
+1. Na câmera, fixe **foco**, **brilho**, **ISO** e **balanço de branco**. No modo automático, a câmera compensaria as diferenças que você quer medir.
 2. Apoie a câmera em cima do turbidímetro, apontada para baixo pelo furo da tampa.
-3. Com o LED ligado, coloque a amostra sobre o furo iluminado.
-4. Fotografe. Troque a amostra e repita, sem mudar a posição nem os ajustes da câmera.
-5. Em cada foto, meça o **brilho** e a **saturação** dos pixels que mostram a amostra, na área por onde a luz passou.
+3. Com o LED ligado, fotografe primeiro o **branco**: água limpa, no mesmo tipo de recipiente das amostras. Ele é a referência para comparação.
+4. Coloque a amostra sobre o furo iluminado e fotografe. Repita com as outras, sem mudar a posição nem os ajustes da câmera.
+5. Em cada foto, meça o **brilho** e a **saturação** dos pixels que mostram a amostra, na área por onde a luz passou. Use sempre a mesma área.
 
-Cada participante montou o próprio turbidímetro, com variações, como parte da experimentação.
+Recipientes e volumes **podem variar de propósito**, para observar o que muda. Anote o recipiente e o volume de cada foto, faça um branco para cada combinação e compare amostras só quando souber o que mudou entre elas. Cada participante também montou o próprio turbidímetro, com variações, como parte da experimentação.
+
+#### Como medir brilho e saturação
+
+- **[ImageJ](https://imagej.net/):** abra a foto, use **Image > Type > HSB Stack** e marque a área iluminada. Com **Analyze > Measure**, leia a média (*Mean*) na fatia de saturação e na de brilho. Para repetir a mesma área em outras fotos, use **Edit > Selection > Restore Selection**.
+- **Aplicativo de seletor de cores (*color picker*):** leia os valores HSB ou HSV (S = saturação; B ou V = brilho) em alguns pontos da área iluminada e calcule a média. É mais rápido, mas depende dos pontos escolhidos.
 
 ### 📊 Observações registradas
 
@@ -53,7 +58,7 @@ Captura de tela com histogramas de intensidade de pixels. O nome do arquivo indi
 | --- | --- |
 | Corte do MDF | Cortadora a laser CO₂ de 80 W (marca e modelo a confirmar) |
 | Registro | Câmera de celular, webcam ou equivalente, com foco e brilho fixos |
-| Análise | Brilho e saturação dos pixels da amostra |
+| Análise | ImageJ ou aplicativo de seletor de cores |
 
 ---
 
@@ -66,7 +71,7 @@ Captura de tela com histogramas de intensidade de pixels. O nome do arquivo indi
 | Bateria | 1 | CR2032, 3 V |
 | Material difusor | 1 | Folha A4 ou equivalente |
 | Câmera | 1 | Celular, webcam ou equivalente |
-| Recipiente de amostra | — | Copo plástico ou placa de Petri |
+| Recipientes de amostra | — | Copo plástico, placa de Petri ou outros, para comparar |
 
 Sugestão registrada no projeto de origem: no lugar do copo plástico, usar um béquer ou um copo de paredes retas.
 

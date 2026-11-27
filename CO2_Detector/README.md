@@ -31,7 +31,7 @@ O sensor SenseAir S8 mede a concentração de CO₂, o ESP32 lê o valor pela se
 1. Ao ligar, o display mostra **"Tentando conectar ao WiFi"** com uma contagem de **10 até 0** segundos.
 2. Se conectar, a contagem termina antes, e o equipamento envia a mensagem "ESP32 conectado e pronto!". Se não conectar em 10 segundos, ele **segue offline**.
 3. Em seguida, mostra por 3 segundos a checagem de inicialização, também enviada ao Monitor Serial: **Display: OK**, **Monitor CO2: OK** e **WiFi: OK** (ou **offline**). Se o sensor não responder, aparece **Monitor CO2: FALHA**, e o sketch para. Se o display não responder, o aviso sai só no Monitor Serial.
-4. A leitura é atualizada no display cerca de duas vezes por segundo. Com Wi-Fi, uma mensagem é enviada a cada 30 segundos.
+4. A leitura é atualizada no display cerca de duas vezes por segundo. Com Wi-Fi, uma mensagem é enviada a cada 30 segundos. Se uma leitura falhar, o display mostra **sem leitura**, e nada é enviado.
 
 Há **um único firmware**. As leituras **não são armazenadas**: o que não é enviado se perde. No modo offline, o sketch não desliga o Wi-Fi; se a conexão acontecer depois, os envios passam a ocorrer. Esse comportamento não foi testado em placa.
 
@@ -46,7 +46,7 @@ Há **um único firmware**. As leituras **não são armazenadas**: o que não é
 ### ⚠️ Limitações conhecidas
 
 - Leituras não aferidas contra uma referência.
-- Se o S8 não responder na inicialização, o sketch para até a placa ser reiniciada. Falhas durante a medição não são tratadas.
+- Se o S8 não responder na inicialização, o sketch para até a placa ser reiniciada.
 - O envio ao Telegram acontece dentro do ciclo de medição e pode atrasar a atualização do display.
 - **A conexão com o Telegram não valida o certificado do servidor.** No core `esp32` 3.3.8, `http.begin(url)` sem certificado desativa essa verificação. Quem conseguir interceptar o tráfego pode obter o token do bot; use apenas em rede confiável e com um bot exclusivo para este protótipo.
 - O nome da rede é impresso no Monitor Serial. A senha e o token ficam em texto puro no `.ino` e são gravados na placa.
@@ -116,9 +116,67 @@ Isso não é um esquema elétrico completo: alimentação e níveis de tensão n
 1. Instale o pacote de placas **esp32** (Espressif Systems) e escolha **ESP32 Dev Module**.
 2. Pelo Gerenciador de Bibliotecas, instale **EspSoftwareSerial 8.1.0**, **Adafruit GFX Library** e **Adafruit SSD1306** (com a dependência Adafruit BusIO).
 3. Instale a **S8_UART 1.0.2**: baixe o ZIP da tag `v1.0.2` em [jcomas/S8_UART](https://github.com/jcomas/S8_UART/tree/v1.0.2) e use **Sketch > Incluir Biblioteca > Adicionar biblioteca .ZIP**.
-4. Abra o `.ino` e troque os valores `TROQUE_...` pela sua rede, senha, token do bot e ID do chat. Para uso só offline, pode deixar como está. **Não publique o sketch com os seus dados reais.**
+4. Abra o `.ino` e troque os valores `TROQUE_...` pela sua rede, senha, token do bot e ID do chat ([como obter](#-como-configurar-o-bot-do-telegram)). Para uso só offline, pode deixar como está. **Não publique o sketch com os seus dados reais.**
 5. Compile, carregue e abra o Monitor Serial em 115200 baud.
 6. Confira a checagem de inicialização no display.
+
+## 🤖 Como configurar o bot do Telegram
+
+O envio é opcional. O medidor só **envia** mensagens: ele não recebe comandos. O sketch fala direto com a [API de bots do Telegram](https://core.telegram.org/bots/api) usando `HTTPClient`, que já vem no pacote `esp32`; não é preciso instalar biblioteca de Telegram.
+
+Referência para criar o bot: [Telegram: Control ESP32/ESP8266 Outputs](https://randomnerdtutorials.com/telegram-control-esp32-esp8266-nodemcu-outputs/), de **Rui Santos (Random Nerd Tutorials)**. Aquele tutorial controla saídas da placa e usa outra biblioteca; os passos abaixo valem para este medidor.
+
+### 1. Crie o bot
+
+1. No Telegram, procure **@BotFather** (confira o selo de verificação) e toque em **Start**.
+2. Envie `/newbot`.
+3. Escolha o nome que aparecerá nas conversas e, depois, um nome de usuário terminado em `bot`.
+4. Copie o **token** que o BotFather responder. **Quem tem o token controla o bot**: trate como senha.
+
+### 2. Abra a conversa com o seu bot
+
+Procure o bot pelo nome de usuário e toque em **Start**. Um bot não pode começar uma conversa com você.
+
+### 3. Descubra o ID do chat
+
+**Opção A, pelo IDBot** (usada no tutorial de referência): abra **@myidbot**, toque em **Start** e envie `/getid`. A resposta é o seu ID. Essa opção não exige o token.
+
+**Opção B, pela API do Telegram:** envie uma mensagem ao seu bot e abra no navegador, trocando `SEU_TOKEN`:
+
+```text
+https://api.telegram.org/botSEU_TOKEN/getUpdates
+```
+
+Na resposta, procure `"chat":{"id":123456789`. O número é o ID do chat. Esse endereço contém o token e fica no histórico do navegador: use só no seu computador e não compartilhe a tela. Se a lista vier vazia, envie outra mensagem ao bot e atualize a página.
+
+**Para receber num grupo:** adicione o bot ao grupo, envie no grupo `/start@nome_do_seu_bot` e use a opção B. O ID de um grupo costuma começar com `-`; copie o sinal.
+
+### 4. Preencha o sketch
+
+```cpp
+const char* ssid = "NOME_DA_SUA_REDE";
+const char* password = "SENHA_DA_REDE";
+const char* botToken = "TOKEN_DO_BOTFATHER";
+const char* chatId = "ID_DO_CHAT";
+```
+
+Preencha só na sua cópia local. **Não publique nem envie o `.ino` preenchido.**
+
+### 5. Teste
+
+Carregue o sketch e abra o Monitor Serial em 115200 baud. Deve chegar a mensagem **"ESP32 conectado e pronto!"** e, depois, uma leitura a cada 30 segundos. No Monitor Serial, o código `200` indica envio aceito.
+
+| O que aparece | O que conferir |
+| --- | --- |
+| `WiFi: offline` | Nome e senha da rede; use uma rede de 2,4 GHz |
+| Código `401` ou `404` | Token copiado errado ou substituído |
+| Código `400` com `chat not found` | ID do chat errado, ou você não tocou em **Start** no bot |
+| Código `403` | O bot foi bloqueado ou removido do grupo |
+| `GET... failed` | Conexão com a internet |
+
+**Se o token vazar**, gere outro no BotFather (`/token` ou `/revoke`) e atualize o sketch. Leia também a limitação sobre o certificado do servidor, acima.
+
+---
 
 ## 🚦 Status
 
@@ -162,6 +220,7 @@ Capturas do modelo 3D:
 - Construção: **João Victor Dutra**, em consulta com Willian e Michel.
 - Fotos em `fotos/`: **Casa Firjan**.
 - Firmware: sketch de **Ricardo Michel** (15/07/2025), baseado no exemplo "Get CO2 value" da biblioteca [S8_UART](https://github.com/jcomas/S8_UART) (MIT), de **Josep Comas**.
+- Tutorial de referência para o bot do Telegram: **Rui Santos**, [Random Nerd Tutorials](https://randomnerdtutorials.com/telegram-control-esp32-esp8266-nodemcu-outputs/).
 - Carcaça: a parte superior é remix de [CO2 Weather station - case for Wemos, SSD1306, Senseair S8, MH-Z19](https://www.thingiverse.com/thing:5382369), de **localhorst_**, licenciado sob [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) (página consultada em 26/11/2026).
 
 ## 📄 Licença

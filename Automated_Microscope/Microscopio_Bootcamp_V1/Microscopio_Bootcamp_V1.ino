@@ -7,12 +7,17 @@
   The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 *********/
 
+/*
+  Como o programa funciona:
+  - A ESP32-CAM vira um pequeno servidor web na sua rede.
+  - Porta 80: entrega a página com os botões e recebe os comandos dos servos.
+  - Porta 81: envia o vídeo (MJPEG: uma sequência de fotos JPEG, uma atrás da outra).
+  - Tudo acontece nos servidores; por isso o loop() fica quase vazio.
+*/
+
 #include "esp_camera.h"
 #include <WiFi.h>
-#include "esp_timer.h"
-#include "img_converters.h"
 #include "Arduino.h"
-#include "fb_gfx.h"
 #include "soc/soc.h"             // disable brownout problems
 #include "soc/rtc_cntl_reg.h"    // disable brownout problems
 #include "esp_http_server.h"
@@ -24,124 +29,35 @@ const char* password = "TROQUE_PELA_SENHA_DO_WIFI";
 
 #define PART_BOUNDARY "123456789000000000000987654321"
 
-#define CAMERA_MODEL_AI_THINKER
-//#define CAMERA_MODEL_M5STACK_PSRAM
-//#define CAMERA_MODEL_M5STACK_WITHOUT_PSRAM
-//#define CAMERA_MODEL_M5STACK_PSRAM_B
-//#define CAMERA_MODEL_WROVER_KIT
+// Pinos da câmera na placa ESP32-CAM AI Thinker (definidos pela placa; não mude)
+#define PWDN_GPIO_NUM     32
+#define RESET_GPIO_NUM    -1
+#define XCLK_GPIO_NUM      0
+#define SIOD_GPIO_NUM     26
+#define SIOC_GPIO_NUM     27
+#define Y9_GPIO_NUM       35
+#define Y8_GPIO_NUM       34
+#define Y7_GPIO_NUM       39
+#define Y6_GPIO_NUM       36
+#define Y5_GPIO_NUM       21
+#define Y4_GPIO_NUM       19
+#define Y3_GPIO_NUM       18
+#define Y2_GPIO_NUM        5
+#define VSYNC_GPIO_NUM    25
+#define HREF_GPIO_NUM     23
+#define PCLK_GPIO_NUM     22
 
-#if defined(CAMERA_MODEL_WROVER_KIT)
-  #define PWDN_GPIO_NUM    -1
-  #define RESET_GPIO_NUM   -1
-  #define XCLK_GPIO_NUM    21
-  #define SIOD_GPIO_NUM    26
-  #define SIOC_GPIO_NUM    27
-  
-  #define Y9_GPIO_NUM      35
-  #define Y8_GPIO_NUM      34
-  #define Y7_GPIO_NUM      39
-  #define Y6_GPIO_NUM      36
-  #define Y5_GPIO_NUM      19
-  #define Y4_GPIO_NUM      18
-  #define Y3_GPIO_NUM       5
-  #define Y2_GPIO_NUM       4
-  #define VSYNC_GPIO_NUM   25
-  #define HREF_GPIO_NUM    23
-  #define PCLK_GPIO_NUM    22
-
-#elif defined(CAMERA_MODEL_M5STACK_PSRAM)
-  #define PWDN_GPIO_NUM     -1
-  #define RESET_GPIO_NUM    15
-  #define XCLK_GPIO_NUM     27
-  #define SIOD_GPIO_NUM     25
-  #define SIOC_GPIO_NUM     23
-  
-  #define Y9_GPIO_NUM       19
-  #define Y8_GPIO_NUM       36
-  #define Y7_GPIO_NUM       18
-  #define Y6_GPIO_NUM       39
-  #define Y5_GPIO_NUM        5
-  #define Y4_GPIO_NUM       34
-  #define Y3_GPIO_NUM       35
-  #define Y2_GPIO_NUM       32
-  #define VSYNC_GPIO_NUM    22
-  #define HREF_GPIO_NUM     26
-  #define PCLK_GPIO_NUM     21
-
-#elif defined(CAMERA_MODEL_M5STACK_WITHOUT_PSRAM)
-  #define PWDN_GPIO_NUM     -1
-  #define RESET_GPIO_NUM    15
-  #define XCLK_GPIO_NUM     27
-  #define SIOD_GPIO_NUM     25
-  #define SIOC_GPIO_NUM     23
-  
-  #define Y9_GPIO_NUM       19
-  #define Y8_GPIO_NUM       36
-  #define Y7_GPIO_NUM       18
-  #define Y6_GPIO_NUM       39
-  #define Y5_GPIO_NUM        5
-  #define Y4_GPIO_NUM       34
-  #define Y3_GPIO_NUM       35
-  #define Y2_GPIO_NUM       17
-  #define VSYNC_GPIO_NUM    22
-  #define HREF_GPIO_NUM     26
-  #define PCLK_GPIO_NUM     21
-
-#elif defined(CAMERA_MODEL_AI_THINKER)
-  #define PWDN_GPIO_NUM     32
-  #define RESET_GPIO_NUM    -1
-  #define XCLK_GPIO_NUM      0
-  #define SIOD_GPIO_NUM     26
-  #define SIOC_GPIO_NUM     27
-  
-  #define Y9_GPIO_NUM       35
-  #define Y8_GPIO_NUM       34
-  #define Y7_GPIO_NUM       39
-  #define Y6_GPIO_NUM       36
-  #define Y5_GPIO_NUM       21
-  #define Y4_GPIO_NUM       19
-  #define Y3_GPIO_NUM       18
-  #define Y2_GPIO_NUM        5
-  #define VSYNC_GPIO_NUM    25
-  #define HREF_GPIO_NUM     23
-  #define PCLK_GPIO_NUM     22
-
-#elif defined(CAMERA_MODEL_M5STACK_PSRAM_B)
-  #define PWDN_GPIO_NUM     -1
-  #define RESET_GPIO_NUM    15
-  #define XCLK_GPIO_NUM     27
-  #define SIOD_GPIO_NUM     22
-  #define SIOC_GPIO_NUM     23
-  
-  #define Y9_GPIO_NUM       19
-  #define Y8_GPIO_NUM       36
-  #define Y7_GPIO_NUM       18
-  #define Y6_GPIO_NUM       39
-  #define Y5_GPIO_NUM        5
-  #define Y4_GPIO_NUM       34
-  #define Y3_GPIO_NUM       35
-  #define Y2_GPIO_NUM       32
-  #define VSYNC_GPIO_NUM    25
-  #define HREF_GPIO_NUM     26
-  #define PCLK_GPIO_NUM     21
-
-#else
-  #error "Camera model not selected"
-#endif
-
+// Servos: sinal nos GPIO 14 e 15, andando 10 graus por comando
 #define SERVO_1      14
 #define SERVO_2      15
-
 #define SERVO_STEP   10
 #define SERVO_MAX    180  // ESP32Servo limita write() a 0-180 graus
-#define servo1PosIni 90
-#define servo2PosIni 90
 
 Servo servo1;
 Servo servo2;
 
-int servo1Pos = servo1PosIni;
-int servo2Pos = servo2PosIni;
+int servo1Pos = 90;  // os dois começam no meio do curso
+int servo2Pos = 90;
 
 static const char* _STREAM_CONTENT_TYPE = "multipart/x-mixed-replace;boundary=" PART_BOUNDARY;
 static const char* _STREAM_BOUNDARY = "\r\n--" PART_BOUNDARY "\r\n";
@@ -188,9 +104,9 @@ static const char PROGMEM INDEX_HTML[] = R"rawliteral(
     <h1>ESP32-CAM Pan and Tilt</h1>
     <img src="" id="photo" >
     <table>
-      <tr><td colspan="3" align="center"><button class="button" onmousedown="toggleCheckbox('up');" ontouchstart="toggleCheckbox('up');">Up</button></td></tr>
-      <tr><td align="center"><button class="button" onmousedown="toggleCheckbox('left');" ontouchstart="toggleCheckbox('left');">Left</button></td><td align="center"></td><td align="center"><button class="button" onmousedown="toggleCheckbox('right');" ontouchstart="toggleCheckbox('right');">Right</button></td></tr>
-      <tr><td colspan="3" align="center"><button class="button" onmousedown="toggleCheckbox('down');" ontouchstart="toggleCheckbox('down');">Down</button></td></tr>                   
+      <tr><td colspan="3" align="center"><button class="button" onpointerdown="toggleCheckbox('up');">Up</button></td></tr>
+      <tr><td align="center"><button class="button" onpointerdown="toggleCheckbox('left');">Left</button></td><td align="center"></td><td align="center"><button class="button" onpointerdown="toggleCheckbox('right');">Right</button></td></tr>
+      <tr><td colspan="3" align="center"><button class="button" onpointerdown="toggleCheckbox('down');">Down</button></td></tr>                   
     </table>
    <script>
    function toggleCheckbox(x) {
@@ -209,145 +125,60 @@ static esp_err_t index_handler(httpd_req_t *req){
   return httpd_resp_send(req, (const char *)INDEX_HTML, strlen(INDEX_HTML));
 }
 
+// Envia o vídeo: repete "captura uma foto e manda" até o navegador desconectar.
+// Cada parte tem um separador, um cabeçalho com o tamanho e a imagem JPEG.
 static esp_err_t stream_handler(httpd_req_t *req){
-  camera_fb_t * fb = NULL;
-  esp_err_t res = ESP_OK;
-  size_t _jpg_buf_len = 0;
-  uint8_t * _jpg_buf = NULL;
-  char * part_buf[64];
+  char cabecalho[64];
+  esp_err_t res = httpd_resp_set_type(req, _STREAM_CONTENT_TYPE);
 
-  res = httpd_resp_set_type(req, _STREAM_CONTENT_TYPE);
-  if(res != ESP_OK){
-    return res;
-  }
-
-  while(true){
-    fb = esp_camera_fb_get();
+  while(res == ESP_OK){
+    camera_fb_t *fb = esp_camera_fb_get();  // a câmera já entrega em JPEG (veja setup)
     if (!fb) {
       Serial.println("Camera capture failed");
-      res = ESP_FAIL;
-    } else {
-      if(fb->format != PIXFORMAT_JPEG){
-        bool jpeg_converted = frame2jpg(fb, 80, &_jpg_buf, &_jpg_buf_len);
-        esp_camera_fb_return(fb);
-        fb = NULL;
-        if(!jpeg_converted){
-          Serial.println("JPEG compression failed");
-          res = ESP_FAIL;
-        }
-      } else {
-        _jpg_buf_len = fb->len;
-        _jpg_buf = fb->buf;
-      }
+      return ESP_FAIL;
     }
+    size_t tamanho = snprintf(cabecalho, sizeof(cabecalho), _STREAM_PART, fb->len);
+    res = httpd_resp_send_chunk(req, cabecalho, tamanho);
     if(res == ESP_OK){
-      size_t hlen = snprintf((char *)part_buf, 64, _STREAM_PART, _jpg_buf_len);
-      res = httpd_resp_send_chunk(req, (const char *)part_buf, hlen);
-    }
-    if(res == ESP_OK){
-      res = httpd_resp_send_chunk(req, (const char *)_jpg_buf, _jpg_buf_len);
+      res = httpd_resp_send_chunk(req, (const char *)fb->buf, fb->len);
     }
     if(res == ESP_OK){
       res = httpd_resp_send_chunk(req, _STREAM_BOUNDARY, strlen(_STREAM_BOUNDARY));
     }
-    if(fb){
-      esp_camera_fb_return(fb);
-      fb = NULL;
-      _jpg_buf = NULL;
-    } else if(_jpg_buf){
-      free(_jpg_buf);
-      _jpg_buf = NULL;
-    }
-    if(res != ESP_OK){
-      break;
-    }
-    //Serial.printf("MJPG: %uB\n",(uint32_t)(_jpg_buf_len));
+    esp_camera_fb_return(fb);  // devolve o buffer; sem isso a câmera para de capturar
   }
   return res;
 }
 
+// Move um servo e guarda a posição, sem passar de 0 nem de 180 graus
+static void moveServo(Servo &servo, int &posicao, int passo){
+  posicao = constrain(posicao + passo, 0, SERVO_MAX);
+  servo.write(posicao);
+  Serial.println(posicao);
+}
+
+// Trata os botões da página: /action?go=up, down, left ou right
 static esp_err_t cmd_handler(httpd_req_t *req){
-  char*  buf;
-  size_t buf_len;
-  char variable[32] = {0,};
-  
-  buf_len = httpd_req_get_url_query_len(req) + 1;
-  if (buf_len > 1) {
-    buf = (char*)malloc(buf_len);
-    if(!buf){
-      httpd_resp_send_500(req);
-      return ESP_FAIL;
-    }
-    if (httpd_req_get_url_query_str(req, buf, buf_len) == ESP_OK) {
-      if (httpd_query_key_value(buf, "go", variable, sizeof(variable)) == ESP_OK) {
-      } else {
-        free(buf);
-        httpd_resp_send_404(req);
-        return ESP_FAIL;
-      }
-    } else {
-      free(buf);
-      httpd_resp_send_404(req);
-      return ESP_FAIL;
-    }
-    free(buf);
-  } else {
+  char consulta[32];
+  char comando[8];
+  if (httpd_req_get_url_query_str(req, consulta, sizeof(consulta)) != ESP_OK ||
+      httpd_query_key_value(consulta, "go", comando, sizeof(comando)) != ESP_OK) {
     httpd_resp_send_404(req);
     return ESP_FAIL;
   }
 
-  sensor_t * s = esp_camera_sensor_get();
-  //flip the camera vertically
-  //s->set_vflip(s, 1);          // 0 = disable , 1 = enable
-  // mirror effect
-  //s->set_hmirror(s, 1);          // 0 = disable , 1 = enable
-
-  int res = 0;
-  
-  if(!strcmp(variable, "up")) {
-    if(servo1Pos < SERVO_MAX) {
-      servo1Pos += SERVO_STEP;
-      servo1.write(servo1Pos);
-    }
-    Serial.println(servo1Pos);
-    Serial.println("Up");
-  }
-  else if(!strcmp(variable, "left")) {
-    if(servo2Pos < SERVO_MAX) {
-      servo2Pos += SERVO_STEP;
-      servo2.write(servo2Pos);
-    }
-    Serial.println(servo2Pos);
-    Serial.println("Left");
-  }
-  else if(!strcmp(variable, "right")) {
-    if(servo2Pos >= 10) {
-      servo2Pos -= SERVO_STEP;
-      servo2.write(servo2Pos);
-    }
-    Serial.println(servo2Pos);
-    Serial.println("Right");
-  }
-  else if(!strcmp(variable, "down")) {
-    if(servo1Pos >= 10) {
-      servo1Pos -= SERVO_STEP;
-      servo1.write(servo1Pos);
-    }
-    Serial.println(servo1Pos);
-    Serial.println("Down");
-  }
-  else {
-    res = -1;
-  }
-
-  if(res){
-    return httpd_resp_send_500(req);
-  }
+  Serial.println(comando);
+  if      (!strcmp(comando, "up"))    moveServo(servo1, servo1Pos,  SERVO_STEP);
+  else if (!strcmp(comando, "down"))  moveServo(servo1, servo1Pos, -SERVO_STEP);
+  else if (!strcmp(comando, "left"))  moveServo(servo2, servo2Pos,  SERVO_STEP);
+  else if (!strcmp(comando, "right")) moveServo(servo2, servo2Pos, -SERVO_STEP);
+  else return httpd_resp_send_500(req);
 
   httpd_resp_set_hdr(req, "Access-Control-Allow-Origin", "*");
   return httpd_resp_send(req, NULL, 0);
 }
 
+// Cria os dois servidores. O vídeo fica separado para não bloquear os botões.
 void startCameraServer(){
   httpd_config_t config = HTTPD_DEFAULT_CONFIG();
   config.server_port = 80;
@@ -382,7 +213,9 @@ void startCameraServer(){
 }
 
 void setup() {
-  WRITE_PERI_REG(RTC_CNTL_BROWN_OUT_REG, 0); //disable brownout detector
+  // Desliga o detector de queda de tensão (brownout). Ele reiniciaria a placa em quedas de energia;
+  // para investigar travamentos, comente a linha e observe o Monitor Serial.
+  WRITE_PERI_REG(RTC_CNTL_BROWN_OUT_REG, 0);
   servo1.setPeriodHertz(50);    // standard 50 hz servo
   servo2.setPeriodHertz(50);    // standard 50 hz servo
   
@@ -417,6 +250,7 @@ void setup() {
   config.xclk_freq_hz = 20000000;
   config.pixel_format = PIXFORMAT_JPEG; 
   
+  // PSRAM é uma memória extra da placa: com ela dá para usar dois buffers de imagem
   if(psramFound()){
     config.frame_size = FRAMESIZE_VGA;
     config.jpeg_quality = 10;
@@ -427,7 +261,8 @@ void setup() {
     config.fb_count = 1;
   }
   
-  // Camera init
+  // Para inverter a imagem, depois de iniciar a câmera use:
+  // esp_camera_sensor_get()->set_vflip(esp_camera_sensor_get(), 1);   (ou set_hmirror)
   esp_err_t err = esp_camera_init(&config);
   if (err != ESP_OK) {
     Serial.printf("Camera init failed with error 0x%x", err);

@@ -19,6 +19,9 @@ Registra o **firmware**, com numeração própria por projeto no formato [SemVer
 - Corrige o intervalo de notificação para 30 segundos, conforme o comentário original (o valor era 3000 ms).
 - Atualiza a leitura antes de desenhar a tela.
 - As leituras não são armazenadas.
+- Quando a leitura do sensor falha (a biblioteca devolve 0), mostra "sem leitura" e não envia o valor.
+- Imprime a resposta do Telegram também em caso de erro, para ajudar no diagnóstico.
+- Código reorganizado, sem partes não usadas, e comentado.
 
 ## Microscópio automatizado
 
@@ -28,6 +31,9 @@ Registra o **firmware**, com numeração própria por projeto no formato [SemVer
 - Limita os contadores de posição dos servos a 0–180; antes, o contador passava de 180, e os primeiros comandos de volta não moviam o servo.
 - Monta o endereço do vídeo a partir do nome do servidor, sem depender do formato da URL da página.
 - Remove a condição de largura no fluxo de vídeo que, em resoluções de até 400 pixels, levava a enviar um quadro vazio.
+- Usa um único evento de toque ou clique nos botões da página, para o celular não enviar o comando duas vezes.
+- Mantém só a pinagem da placa AI Thinker e remove a conversão de imagem que não era usada (a câmera já entrega JPEG).
+- Corrige o tamanho do buffer do cabeçalho do vídeo, simplifica a leitura dos comandos e comenta o código.
 
 ## Incubadora/Estufa
 
@@ -41,6 +47,7 @@ Registra o **firmware**, com numeração própria por projeto no formato [SemVer
 - Usa uma única leitura de temperatura por ciclo no controle, no LCD e no Monitor Serial.
 - Usa `analogWrite` também ao aplicar a potência máxima do ventilador.
 - Corrige os comentários trocados dos botões.
+- Reorganiza e comenta o código; os textos do Monitor Serial ficam na memória flash, o que reduz o uso de RAM.
 
 ## Turbidímetro
 

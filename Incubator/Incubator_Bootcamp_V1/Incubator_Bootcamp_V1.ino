@@ -3,69 +3,70 @@ Versão do firmware: 1.0.1
 
 Código da Incubadora/Estufa V1 com:
 - Controle ON/OFF de temperatura com a lâmpada 250W,
-- Sensoreamento de temperatura com o DS18B20, 
+- Sensoreamento de temperatura com o DS18B20,
 - 2 Botões para definir a temperatura alvo,
 - Cooler para fluxo de ar dentro da incubadora,
 - Lâmpada desligada ao iniciar e quando a leitura do DS18B20 falha,
 - Temperatura alvo limitada a 60 °C.
+
+Como o programa funciona:
+O loop() não usa delay(). Ele passa milhares de vezes por segundo e, a cada volta:
+1. confere os botões;
+2. quando passam 750 ms, lê a temperatura, decide sobre a lâmpada e pede a próxima medida.
 */
 
-// Incluir as bibliotecas para o LCD e Sensor de Temperatura DS18B20:
 #include <LiquidCrystal.h>
 #include <OneWire.h>
 #include <DallasTemperature.h>
 
-// Pino de dados para o sensor DS18B20:
-#define ONE_WIRE_BUS 8
-
-// Setup ado OneWire:
-OneWire oneWire(ONE_WIRE_BUS);
-
-// Referência do DS18B20 para o OneWire:
+// Sensor de temperatura DS18B20 (protocolo 1-Wire: um único fio de dados)
+const int pinoSensor = 8;
+OneWire oneWire(pinoSensor);
 DallasTemperature sensors(&oneWire);
 
-// Associando os pinos de interface do LCD:
-const int rs = 12, en = 11, d4 = 5, d5 = 4, d6 = 3, d7 = 2;
-LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
+// LCD 16x2: pinos RS, EN, D4, D5, D6, D7
+LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
 
-// Definindo os pinos que não necessitam de biblioteca:
-
-int intensidadeCooler = 255; // Intensidade do PWM do cooler em 8 bit (0 a 255)
-const int pinoLampada = 6; // Pino de OUTPUT para controle do relé que permite a operação da lâmpada 250W
-const int cooler = 10; // Pino de OUTPUT para o controle do cooler
-const int butDown = 9; // Pino de INPUT com PULLUP para descer a temperatura alvo
-const int butUp = 13; // Pino de INPUT com PULLUP para subir a temperatura alvo
-
-float temperaturaAlvo = 37.5;     // Temperatura alvo desejada para a incubadora em graus Celsius (ex: 37.5°C para ovos)
-float histerese = 0.5; // Valor de histerese em graus Celsius para não ficar com a lâmpada ligando e desligando muito rápido.
-const float temperaturaAlvoMaxima = 60.0; // Limite do ajuste pelos botões. Não substitui uma proteção térmica independente.
+const int pinoLampada = 6;  // controla o relé da lâmpada de 250 W
+const int pinoCooler = 10;  // ventilador, com velocidade controlada por PWM (0 a 255)
+const int butDown = 9;      // botão que diminui a temperatura alvo
+const int butUp = 13;       // botão que aumenta a temperatura alvo
 
 // Nível do pino que liga e desliga o relé.
 // ATENÇÃO: confira no circuito real, com a lâmpada fora da rede. Se o seu relé liga com HIGH, inverta as duas linhas.
 const int RELE_LIGADO = LOW;
 const int RELE_DESLIGADO = HIGH;
 
+const int COOLER_MAXIMO = 255;  // usado ao aquecer e quando o sensor falha
+const int COOLER_REPOUSO = 122;  // usado depois de atingir o alvo
+
+float temperaturaAlvo = 37.5;               // em °C (ex.: 37,5 °C para ovos)
+const float temperaturaAlvoMaxima = 60.0;  // limite dos botões; não substitui proteção térmica independente
+// Histerese: a lâmpada só religa 0,5 °C abaixo do alvo, para não ficar ligando e desligando sem parar
+const float histerese = 0.5;
+
+int intensidadeCooler = COOLER_MAXIMO;
+
 // Tempos em milissegundos
-const unsigned long tempoConversao = 750;  // conversão do DS18B20 em 12 bits
-const unsigned long tempoDebounce = 50;    // estabilidade exigida do botão
+const unsigned long tempoConversao = 750;  // quanto o DS18B20 leva para medir em 12 bits
+const unsigned long tempoDebounce = 50;    // quanto o botão precisa ficar estável
 const unsigned long tempoRepeticao = 400;  // repetição com o botão pressionado
-
 unsigned long inicioConversao = 0;
-float temperaturaAtual = DEVICE_DISCONNECTED_C;
 
-
+// Debounce: o contato do botão "treme" ao ser apertado. Só vale a leitura que ficar estável.
 struct Botao {
   int pino;
-  int leitura;    // última leitura crua
-  int estado;     // leitura já filtrada
+  int leitura;  // última leitura crua
+  int estado;   // leitura já filtrada
   unsigned long mudou;
   unsigned long repetiu;
 };
 
+// Com INPUT_PULLUP, o botão solto lê HIGH e o apertado lê LOW
 Botao botaoSobe = {butUp, HIGH, HIGH, 0, 0};
 Botao botaoDesce = {butDown, HIGH, HIGH, 0, 0};
 
-// true uma vez a cada toque e, com o botão pressionado, a cada tempoRepeticao
+// Retorna true uma vez a cada toque e, com o botão pressionado, a cada tempoRepeticao
 bool botaoAcionado(Botao &b) {
   const int agoraLido = digitalRead(b.pino);
   const unsigned long agora = millis();
@@ -93,55 +94,58 @@ void escreveLinha(int linha, String texto) {
   lcd.print(texto);
 }
 
-// Rejeita DEVICE_DISCONNECTED_C (-127) e valores fora da faixa do DS18B20
+void mostraAlvo() {
+  escreveLinha(1, "TempAlvo: " + String(temperaturaAlvo));
+}
+
+// Único lugar que mexe nas duas saídas: relé da lâmpada e ventilador
+void aplicaSaidas(bool aquecer, int cooler) {
+  digitalWrite(pinoLampada, aquecer ? RELE_LIGADO : RELE_DESLIGADO);
+  intensidadeCooler = cooler;
+  analogWrite(pinoCooler, intensidadeCooler);
+}
+
+// Faixa que o DS18B20 mede. Desconectado, a biblioteca devolve -127 e cai fora dela.
 bool leituraValida(float t) {
-  return t != DEVICE_DISCONNECTED_C && t >= -55.0 && t <= 125.0;
+  return t >= -55.0 && t <= 125.0;
 }
 
-void defineAquecimento(bool ligar) {
-  digitalWrite(pinoLampada, ligar ? RELE_LIGADO : RELE_DESLIGADO);
-}
-
-void controlaTemperatura() {
-  const bool ligada = digitalRead(pinoLampada) == RELE_LIGADO;
-
+// F("texto") deixa o texto na memória flash e poupa a RAM do UNO (só 2 KB)
+void controlaTemperatura(float temperaturaAtual) {
   if (!leituraValida(temperaturaAtual)) {
-    // Sem leitura confiável: lâmpada desligada e ventilador no máximo
-    defineAquecimento(false);
-    intensidadeCooler = 255;
-    analogWrite(cooler, intensidadeCooler);
+    // Segurança primeiro: sem leitura confiável, nada de aquecer
+    aplicaSaidas(false, COOLER_MAXIMO);
     escreveLinha(0, "ERRO NO SENSOR");
-    Serial.println("ERRO: DS18B20 desconectado ou leitura invalida. Lampada DESLIGADA.");
+    Serial.println(F("ERRO: DS18B20 desconectado ou leitura invalida. Lampada DESLIGADA."));
     return;
   }
 
   escreveLinha(0, "TempC: " + String(temperaturaAtual, 2));
+  const bool ligada = digitalRead(pinoLampada) == RELE_LIGADO;
 
   if (temperaturaAtual < (temperaturaAlvo - histerese) && !ligada) {
-    // Abaixo de temperaturaAlvo - histerese e desligada: liga para aquecer
-    defineAquecimento(true);
-    intensidadeCooler = 255;
-    analogWrite(cooler, intensidadeCooler);
-    Serial.println("Lâmpada LIGADA (temperatura muito baixa)!");
+    aplicaSaidas(true, COOLER_MAXIMO);
+    Serial.println(F("Lâmpada LIGADA (temperatura muito baixa)!"));
   } else if (temperaturaAtual >= temperaturaAlvo && ligada) {
-    // Atingiu o alvo: desliga
-    defineAquecimento(false);
-    intensidadeCooler = 122;
-    analogWrite(cooler, intensidadeCooler);
-    Serial.println("Lâmpada DESLIGADA (temperatura atingida)!");
+    aplicaSaidas(false, COOLER_REPOUSO);
+    Serial.println(F("Lâmpada DESLIGADA (temperatura atingida)!"));
   } else {
-    // Dentro da banda de histerese ou a lâmpada já está no estado correto
-    Serial.println("Temperatura dentro da faixa.");
+    // Dentro da faixa da histerese, ou a lâmpada já está como deveria
+    Serial.println(F("Temperatura dentro da faixa."));
   }
 
-  Serial.print("Intensidade PWM cooler: ");
+  Serial.print(F("Intensidade PWM cooler: "));
   Serial.print(intensidadeCooler);
-  Serial.print(", ");
-  Serial.print("Temperatura: ");
+  Serial.print(F(", Temperatura: "));
   Serial.print(temperaturaAtual, 2);
-  Serial.print(", ");
-  Serial.print("TemperaturaAlvo: ");
+  Serial.print(F(", TemperaturaAlvo: "));
   Serial.println(temperaturaAlvo);
+}
+
+// Pede uma medida ao sensor sem esperar o resultado
+void pedeTemperatura() {
+  sensors.requestTemperatures();
+  inicioConversao = millis();
 }
 
 void setup() {
@@ -149,43 +153,35 @@ void setup() {
   digitalWrite(pinoLampada, RELE_DESLIGADO);
   pinMode(pinoLampada, OUTPUT);
 
-  // Start serial communication for debugging purposes
   Serial.begin(9600);
-
-  pinMode(cooler, OUTPUT);
+  pinMode(pinoCooler, OUTPUT);
+  analogWrite(pinoCooler, intensidadeCooler);
   pinMode(butUp, INPUT_PULLUP);
   pinMode(butDown, INPUT_PULLUP);
 
-  // Start up the library
   sensors.begin();
   sensors.setResolution(12);
-  sensors.setWaitForConversion(false); // não trava o loop: os botões continuam respondendo
+  sensors.setWaitForConversion(false);  // não trava o loop: os botões continuam respondendo
 
-  // set up the LCD's number of columns and rows:
   lcd.begin(16, 2);
   escreveLinha(0, "TempC: ...");
-  escreveLinha(1, "TempAlvo: " + String(temperaturaAlvo));
+  mostraAlvo();
 
-  analogWrite(cooler, intensidadeCooler);
-
-  sensors.requestTemperatures();
-  inicioConversao = millis();
+  pedeTemperatura();
 }
 
 void loop() {
-  // Os dois botões são lidos em todo ciclo, para o debounce de cada um ficar em dia
+  // Os dois botões são lidos em toda volta, para o debounce de cada um ficar em dia
   const bool sobe = botaoAcionado(botaoSobe);
   const bool desce = botaoAcionado(botaoDesce);
   if (sobe || desce) {
     if (sobe) temperaturaAlvo = min(temperaturaAlvo + 0.5f, temperaturaAlvoMaxima);
     if (desce) temperaturaAlvo -= 0.5;
-    escreveLinha(1, "TempAlvo: " + String(temperaturaAlvo));
+    mostraAlvo();
   }
 
   if (millis() - inicioConversao >= tempoConversao) {
-    temperaturaAtual = sensors.getTempCByIndex(0);
-    controlaTemperatura();
-    sensors.requestTemperatures();
-    inicioConversao = millis();
+    controlaTemperatura(sensors.getTempCByIndex(0));
+    pedeTemperatura();
   }
 }
