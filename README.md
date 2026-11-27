@@ -50,9 +50,7 @@ Os nomes **V1, V01, V02, V03 e V06** presentes em arquivos e títulos identifica
 
 ## Licenças
 
-O arquivo [LICENSE](LICENSE) contém a licença MIT, com copyright de 2025 de `fablabcasafirjan`, e é preservado sem alteração. Materiais de terceiros mantêm seus avisos e condições, como o remix CC BY 4.0 acima.
-
-**A confirmar:** a licença de cada desenho, STL e fotografia. Versões do README de origem de 2025 exibiram um selo CC BY 4.0 junto ao selo MIT, sem dizer quais materiais cobria; a versão de 11/11/2026 não tem o selo. Este README não altera nem amplia direitos de ninguém.
+Este fork mantém a licença do repositório original: **MIT**, no arquivo [LICENSE](LICENSE), com copyright de 2025 de `fablabcasafirjan`, sem alteração. Materiais de terceiros mantêm os próprios avisos e condições, como o remix CC BY 4.0 citado acima.
 
 ## English summary
 

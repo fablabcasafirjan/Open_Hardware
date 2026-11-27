@@ -12,6 +12,16 @@ Protótipo didático em MDF e acrílico com Arduino UNO, sensor DS18B20, LCD, do
 >
 > Os próprios comentários do código pedem para conferir a polaridade do relé no circuito real. A montagem na rede elétrica deve ser feita por pessoa habilitada.
 
+## Sugestões de segurança (ainda não implementadas)
+
+São recomendações para revisar antes de usar o equipamento. O firmware não as aplica, porque a polaridade do relé precisa ser confirmada no circuito real.
+
+- Garantir que o relé fique **desligado** ao energizar e durante a reinicialização da placa, no firmware e no circuito.
+- Desligar a lâmpada e sinalizar o erro quando a leitura do sensor for inválida (por exemplo, -127 °C) ou estiver fora de uma faixa plausível.
+- Limitar a temperatura alvo a um mínimo e um máximo definidos em ensaio.
+- Instalar uma proteção térmica **independente do Arduino** (termostato de segurança ou fusível térmico), pois um relé de estado sólido pode falhar fechado.
+- Prever fusível, aterramento, isolamento das partes ligadas à rede e distância entre a lâmpada e materiais inflamáveis, como o MDF.
+
 ## Fotos
 
 | Fechada | Aberta | Ligada |
