@@ -7,6 +7,7 @@
   S8_UART, by Josep Comas, ver. 1.0.2
 
   ESP32 Dev Module
+  Versão do firmware: 1.0.2
 
  *******/
 
@@ -20,29 +21,29 @@
 #include <Adafruit_SSD1306.h>
 #include <WiFi.h>
 #include <HTTPClient.h>
+#include "secrets.h"
 
-//Internet
-const char* ssid = "Your_Login_Network";
-const char* password = "Your_network_Password";
+const char* ssid = WIFI_SSID;
+const char* password = WIFI_PASSWORD;
 
-//token do bot in telegram
-const String botToken = "Your_Bot_Token";
+//token do bot
+const char* botToken = TELEGRAM_BOT_TOKEN;
 //id do chat do telegram
-const String chatId = "Your_chat_ID";
+const char* chatId = TELEGRAM_CHAT_ID;
 
 // URL base para a API do Telegram
 const String telegramApiBase = "https://api.telegram.org/bot";
 
 //controlar o tempo de envio da mensagem
 unsigned long lastSendTime = 0; //armazena o tempo da ultima mensagem enviada
-const long sendInterval = 3000; //a cada 30 segundos
+const unsigned long sendInterval = 30000UL; // a cada 30 segundos
 
 #define SCREEN_WIDTH 128  // OLED display width, in pixels
 #define SCREEN_HEIGHT 64  // OLED display height, in pixels
 
 
 #define OLED_RESET -1        // Reset pin # (or -1 if sharing Arduino reset pin)
-#define SCREEN_ADDRESS 0x3C  ///< See datasheet for Address; 0x3D for 128x64, 0x3C for 128x32
+#define SCREEN_ADDRESS 0x3C  ///< Endereço do display 128x64 usado nas placas deste projeto
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 
@@ -59,23 +60,14 @@ S8_sensor sensor;
 EspSoftwareSerial::UART S8_serial;
 
 void setup() {
-  //  inicia as duas formas de comunicação serial: com o SenseAir S8 e com o terminal
-  S8_serial.begin(9600, SWSERIAL_8N1, S8_RX_PIN, S8_TX_PIN);
+  // inicia a serial do terminal; a do SenseAir S8 é iniciada mais abaixo
   Serial.begin(DEBUG_BAUDRATE);
 
   Serial.print("Conectando a ");
   Serial.println(ssid);
   WiFi.begin(ssid, password);
 
-  /*while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    Serial.print(".");
-  }
-  Serial.println("");
-  Serial.println("WiFi conectado!");
-  Serial.print("Endereço IP: ");
-  Serial.println(WiFi.localIP());
-  */
+  // Versão offline: não espera o Wi-Fi conectar; sem rede, as mensagens não são enviadas
 
   // Envia uma mensagem de teste logo após conectar
   sendMessageToTelegram("ESP32 conectado e pronto!");
@@ -91,7 +83,7 @@ void setup() {
   Serial.println("");
   Serial.println("Iniciando...");
   // Inicializa o SenseAir S8
-  S8_serial.begin(S8_BAUDRATE);
+  S8_serial.begin(S8_BAUDRATE, SWSERIAL_8N1, S8_RX_PIN, S8_TX_PIN);
   sensor_S8 = new S8_UART(S8_serial);
   // Verifica se o SenseAir S8 está se comunicando
   sensor_S8->get_firmware_version(sensor.firm_version);
@@ -123,7 +115,7 @@ void setup() {
 
 
 void loop() {
-
+  sensor.co2 = sensor_S8->get_co2();
 
   display.clearDisplay();
   display.setTextSize(1);
@@ -138,23 +130,38 @@ void loop() {
 
   display.display();
 
+  printf("CO2 value = %d ppm\n", sensor.co2);
 
-  sensor.co2 = sensor_S8->get_co2();           // Obtém os valores de concentração de CO2 em ppm
-  printf("CO2 value = %d ppm\n", sensor.co2);  // Mostra a concentração no terminal
-  
   if (millis() - lastSendTime >= sendInterval) {
     lastSendTime = millis();
-    String message = "Sensor de CO2 FabLab! Nível de CO2: " + String(sensor.co2) + "ppm"; //exemplo
+    String message = "Sensor de CO2 FabLab! Nível de CO2: " + String(sensor.co2) + "ppm";
     sendMessageToTelegram(message);
   }
 
-  delay(500);                                  //aguarda a próxima medida
+  delay(500);
+}
+// Codifica o texto para uso na URL (percent-encoding, RFC 3986)
+String urlEncode(const String &text) {
+  const char *hex = "0123456789ABCDEF";
+  String out;
+  out.reserve(text.length() * 3);
+  for (size_t i = 0; i < text.length(); i++) {
+    uint8_t c = text[i];
+    if (isalnum(c) || c == '-' || c == '_' || c == '.' || c == '~') {
+      out += (char)c;
+    } else {
+      out += '%';
+      out += hex[c >> 4];
+      out += hex[c & 0x0F];
+    }
+  }
+  return out;
 }
 
 void sendMessageToTelegram(String message) {
   if (WiFi.status() == WL_CONNECTED) {  //so vai enviar se o wifi estiver conectado
     HTTPClient http;
-    String url = telegramApiBase + botToken + "/sendMessage?chat_id=" + chatId + "&text=" + message;
+    String url = telegramApiBase + botToken + "/sendMessage?chat_id=" + chatId + "&text=" + urlEncode(message);
 
     Serial.print("Enviando mensagem ao Telegram: ");
     Serial.println(message);

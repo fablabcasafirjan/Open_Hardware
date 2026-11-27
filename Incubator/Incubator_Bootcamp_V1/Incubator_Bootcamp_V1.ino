@@ -1,4 +1,6 @@
 /*
+Versão do firmware: 1.0.1
+
 Código da Incubadora V03 com:
 - Controle ON/OFF de temperatura com a lâmpada 250W,
 - Sensoreamento de temperatura com o DS18B20, 
@@ -29,8 +31,8 @@ LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
 int intensidadeCooler = 255; // Intensidade do PWM do cooler em 8 bit (0 a 255)
 const int pinoLampada = 6; // Pino de OUTPUT para controle do relé que permite a operação da lâmpada 250W
 const int cooler = 10; // Pino de OUTPUT para o controle do cooler
-const int butDown = 9; // Pino de INPUT com PULLUP para subir a temperatura alvo
-const int butUp = 13; // Pino de INPUT com PULLUP para descer a temperatura alvo
+const int butDown = 9; // Pino de INPUT com PULLUP para descer a temperatura alvo
+const int butUp = 13; // Pino de INPUT com PULLUP para subir a temperatura alvo
 
 float temperaturaAlvo = 37.5;     // Temperatura alvo desejada para a incubadora em graus Celsius (ex: 37.5°C para ovos)
 float histerese = 0.5; // Valor de histerese em graus Celsius para não ficar com a lâmpada ligando e desligando muito rápido.

@@ -7,6 +7,7 @@
   S8_UART, by Josep Comas, ver. 1.0.2
 
   ESP32 Dev Module
+  Versão do firmware: 1.0.2
 
  *******/
 
@@ -42,7 +43,7 @@ const unsigned long sendInterval = 30000UL; // a cada 30 segundos
 
 
 #define OLED_RESET -1        // Reset pin # (or -1 if sharing Arduino reset pin)
-#define SCREEN_ADDRESS 0x3C  ///< See datasheet for Address; 0x3D for 128x64, 0x3C for 128x32
+#define SCREEN_ADDRESS 0x3C  ///< Endereço do display 128x64 usado nas placas deste projeto
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 
@@ -59,8 +60,7 @@ S8_sensor sensor;
 EspSoftwareSerial::UART S8_serial;
 
 void setup() {
-  //  inicia as duas formas de comunicação serial: com o SenseAir S8 e com o terminal
-  S8_serial.begin(9600, SWSERIAL_8N1, S8_RX_PIN, S8_TX_PIN);
+  // inicia a serial do terminal; a do SenseAir S8 é iniciada mais abaixo
   Serial.begin(DEBUG_BAUDRATE);
 
   Serial.print("Conectando a ");
@@ -90,7 +90,7 @@ void setup() {
   Serial.println("");
   Serial.println("Iniciando...");
   // Inicializa o SenseAir S8
-  S8_serial.begin(S8_BAUDRATE);
+  S8_serial.begin(S8_BAUDRATE, SWSERIAL_8N1, S8_RX_PIN, S8_TX_PIN);
   sensor_S8 = new S8_UART(S8_serial);
   // Verifica se o SenseAir S8 está se comunicando
   sensor_S8->get_firmware_version(sensor.firm_version);
@@ -147,10 +147,28 @@ void loop() {
 
   delay(500);
 }
+// Codifica o texto para uso na URL (percent-encoding, RFC 3986)
+String urlEncode(const String &text) {
+  const char *hex = "0123456789ABCDEF";
+  String out;
+  out.reserve(text.length() * 3);
+  for (size_t i = 0; i < text.length(); i++) {
+    uint8_t c = text[i];
+    if (isalnum(c) || c == '-' || c == '_' || c == '.' || c == '~') {
+      out += (char)c;
+    } else {
+      out += '%';
+      out += hex[c >> 4];
+      out += hex[c & 0x0F];
+    }
+  }
+  return out;
+}
+
 void sendMessageToTelegram(String message) {
   if (WiFi.status() == WL_CONNECTED) {  //so vai enviar se o wifi estiver conectado
     HTTPClient http;
-    String url = telegramApiBase + botToken + "/sendMessage?chat_id=" + chatId + "&text=" + message;
+    String url = telegramApiBase + botToken + "/sendMessage?chat_id=" + chatId + "&text=" + urlEncode(message);
 
     Serial.print("Enviando mensagem ao Telegram: ");
     Serial.println(message);

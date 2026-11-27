@@ -1,4 +1,6 @@
 /*********
+  Versão do firmware: 1.0.2
+
   Rui Santos & Sara Santos - Random Nerd Tutorials
   Complete instructions at https://RandomNerdTutorials.com/esp32-cam-projects-ebook/
   Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files.
@@ -132,6 +134,7 @@ const char* password = WIFI_PASSWORD;
 #define SERVO_2      15
 
 #define SERVO_STEP   10
+#define SERVO_MAX    180  // ESP32Servo limita write() a 0-180 graus
 #define servo1PosIni 90
 #define servo2PosIni 90
 
@@ -305,7 +308,7 @@ static esp_err_t cmd_handler(httpd_req_t *req){
   int res = 0;
   
   if(!strcmp(variable, "up")) {
-    if(servo1Pos <= 340) {
+    if(servo1Pos < SERVO_MAX) {
       servo1Pos += SERVO_STEP;
       servo1.write(servo1Pos);
     }
@@ -313,7 +316,7 @@ static esp_err_t cmd_handler(httpd_req_t *req){
     Serial.println("Up");
   }
   else if(!strcmp(variable, "left")) {
-    if(servo2Pos <= 340) {
+    if(servo2Pos < SERVO_MAX) {
       servo2Pos += SERVO_STEP;
       servo2.write(servo2Pos);
     }
