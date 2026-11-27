@@ -67,7 +67,7 @@ Os quatro projetos estão na **V1**, a versão lançada no bootcamp. As revisõe
 
 | Ferramenta | Uso |
 | --- | --- |
-| Cortadora a laser CO₂ de 80 W (marca e modelo a confirmar) | Corte das peças em MDF e acrílico |
+| Cortadora a laser CO₂ Duplotech 1310, 100 W | Corte das peças em MDF e acrílico |
 | Impressora 3D Bambu Lab A1 | Peças em PLA: caixa do medidor de CO₂ e dobradiças da incubadora |
 | Inkscape | Desenhos SVG da incubadora e do microscópio |
 | Tinkercad | Esquema didático da incubadora |

@@ -71,7 +71,7 @@ A câmara tem uma lâmpada de aquecimento, um ventilador, um sensor de temperatu
 | --- | --- |
 | Desenho das peças | Inkscape |
 | Esquema didático | Tinkercad |
-| Corte do MDF e do acrílico | Cortadora a laser CO₂ de 80 W (marca e modelo a confirmar) |
+| Corte do MDF e do acrílico | Cortadora a laser CO₂ Duplotech 1310, 100 W |
 | Dobradiças em PLA | Impressora 3D Bambu Lab A1 |
 | Firmware | Arduino IDE |
 

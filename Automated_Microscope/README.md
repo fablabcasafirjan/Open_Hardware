@@ -60,7 +60,7 @@ Captura feita durante o bootcamp, com uma versão anterior do firmware.
 | Etapa | Ferramenta |
 | --- | --- |
 | Desenho das peças | Inkscape |
-| Corte do MDF | Cortadora a laser CO₂ de 80 W (marca e modelo a confirmar) |
+| Corte do MDF | Cortadora a laser CO₂ Duplotech 1310, 100 W |
 | Firmware | Arduino IDE |
 
 ---
