@@ -4,7 +4,7 @@
 
 | | Projeto | O que há na pasta |
 | --- | --- | --- |
-| <img src="Incubator/fotos/incubadora-ligada-frente.jpg" alt="Incubadora/Estufa ligada" width="120"> | [**Incubadora/Estufa V1**](Incubator/README.md) | Sketch para Arduino UNO, desenho SVG, fotos e materiais. |
+| <img src="Incubator/fotos/incubadora-ligada-frente.jpg" alt="Incubadora/Estufa ligada" width="120"> | [**Incubadora/Estufa V1**](Incubator/README.md) | Sketch para Arduino UNO, desenho SVG, esquema didático, fotos e materiais. |
 | <img src="Turbidimeter/Turbidimeter_with_lights_ON.jpeg" alt="Turbidímetro com o LED ligado" width="120"> | [**Turbidímetro V1**](Turbidimeter/README.md) | Materiais, imagem PNG, fotos e histogramas. Não usa firmware. |
 | <img src="CO2_Detector/fotos/co2-montado-leitura.jpg" alt="Medidor de CO₂ montado" width="120"> | [**Medidor de CO₂ V1**](CO2_Detector/README.md) | Sketch para ESP32 que também mede sem Wi-Fi, STL das caixas, fotos e materiais. |
 | <img src="Automated_Microscope/fotos/microscopio-montado.jpg" alt="Microscópio montado" width="120"> | [**Microscópio automatizado V1**](Automated_Microscope/README.md) | Sketch para ESP32-CAM, corte a laser, imagens e materiais. |
@@ -31,7 +31,7 @@ Quatro protótipos didáticos de hardware aberto desenvolvidos no contexto do bo
 
 ```text
 .
-├── Incubator/              sketch, SVG e fotos
+├── Incubator/              sketch, SVG, esquema didático e fotos
 ├── Turbidimeter/           imagem PNG, fotos e histogramas
 ├── CO2_Detector/           sketch, STL das caixas e fotos
 ├── Automated_Microscope/   sketch, SVG, imagens e fotos
@@ -54,7 +54,7 @@ Os quatro projetos estão na **V1**, a versão lançada no bootcamp. As revisõe
 
 | Projeto | Versão | Firmware | Revisões dos arquivos |
 | --- | :---: | :---: | --- |
-| Incubadora/Estufa | V1 | 1.0.1 | Desenho SVG V0.6.0 |
+| Incubadora/Estufa | V1 | 1.0.1 | Desenho SVG V0.6.0; esquema didático V0.3.0 |
 | Turbidímetro | V1 | — | Imagem PNG V0.1.0 |
 | Medidor de CO₂ | V1 | 1.1.0 | STL V0.2.0 e V0.3.0 |
 | Microscópio automatizado | V1 | 1.0.1 | Desenho SVG V0.1.0 |
@@ -66,6 +66,7 @@ Os quatro projetos estão na **V1**, a versão lançada no bootcamp. As revisõe
 | Cortadora a laser CO₂ de 80 W (marca e modelo a confirmar) | Corte das peças em MDF e acrílico |
 | Impressora 3D Bambu Lab A1 | Peças em PLA: caixa do medidor de CO₂ e dobradiças da incubadora |
 | Inkscape | Desenhos SVG da incubadora e do microscópio |
+| Tinkercad | Esquema didático da incubadora |
 | Arduino IDE | Firmware |
 
 ## Créditos

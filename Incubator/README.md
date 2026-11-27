@@ -54,7 +54,7 @@ A câmara tem uma lâmpada de aquecimento, um ventilador, um sensor de temperatu
 ### ⚠️ Limitações conhecidas
 
 - Falta o ensaio térmico: estabilidade, uniformidade e faixa de temperatura não foram medidas.
-- Falta publicar o esquema elétrico e a sequência de montagem.
+- O esquema publicado é didático e simplificado. Faltam o esquema da ligação real e a sequência de montagem.
 - O limite de 60 °C vale para o **alvo**. A temperatura medida pode passar dele, e o limite não é uma proteção térmica.
 - A falha detectada é a de leitura ausente ou fora da faixa do sensor. Um sensor mal posicionado ou com leitura errada, mas plausível, não é percebido.
 
@@ -70,6 +70,7 @@ A câmara tem uma lâmpada de aquecimento, um ventilador, um sensor de temperatu
 | Etapa | Ferramenta |
 | --- | --- |
 | Desenho das peças | Inkscape |
+| Esquema didático | Tinkercad |
 | Corte do MDF e do acrílico | Cortadora a laser CO₂ de 80 W (marca e modelo a confirmar) |
 | Dobradiças em PLA | Impressora 3D Bambu Lab A1 |
 | Firmware | Arduino IDE |
@@ -116,7 +117,19 @@ Pinos confirmados pelo mantenedor deste fork em 26/11/2026:
 | Botão que diminui a temperatura alvo | 9 (`INPUT_PULLUP`) |
 | Botão que aumenta a temperatura alvo | 13 (`INPUT_PULLUP`) |
 
-A tabela não é um esquema elétrico: alimentação, acionamento do ventilador, resistores e ligação de potência não estão documentados.
+### Esquema didático
+
+<img src="Incubadora_circuito_didatico_V0.3.0.png" alt="Circuito no Tinkercad com Arduino UNO, LCD 16x2, dois botões, sensor, ventilador, relé e lâmpada" width="725">
+
+Circuito de aula feito no Tinkercad ("Circuito Incubadora V03"). Os pinos do Arduino conferem com a tabela acima.
+
+> [!CAUTION]
+> **É um esquema para entender as ligações de sinal. Não monte a parte de potência por ele.**
+> - O sensor desenhado (**TMP**) é só um substituto: a montagem usa o **DS18B20**, que normalmente precisa de um resistor de *pull-up* (em geral 4,7 kΩ) entre dados e 5 V. O desenho não mostra esse resistor.
+> - O ventilador aparece ligado direto no pino 10. **Um pino do Arduino não alimenta um ventilador de 12 V**: é preciso um circuito de acionamento com alimentação própria.
+> - O relé é uma peça genérica do simulador, e o cabo USB representa a tomada. O desenho não define o modelo, a polaridade nem a ligação do relé na rede.
+
+A alimentação, o acionamento real do ventilador e a ligação de potência não estão documentados.
 
 | Compartimento superior | Fiação |
 | --- | --- |
@@ -161,7 +174,7 @@ Não são necessariamente as versões da montagem original.
 | Ensaio térmico | **Falta fazer** |
 | Segurança elétrica e térmica | **Não validada** |
 
-**Próximos passos:** confirmar a polaridade do relé na montagem, testar a versão 1.0.1 em placa, publicar o esquema elétrico e a sequência de montagem e fazer o ensaio térmico.
+**Próximos passos:** confirmar a polaridade do relé na montagem, testar a versão 1.0.1 em placa, registrar a ligação real e a sequência de montagem e fazer o ensaio térmico.
 
 ---
 
@@ -185,6 +198,7 @@ A imagem térmica é só um exemplo: não tem escala de temperatura e não subst
 | --- | --- |
 | [Sketch](Incubator_Bootcamp_V1/Incubator_Bootcamp_V1.ino) | Firmware 1.0.1 |
 | [Incubadora_V0.6.0_Organizado.svg](Incubadora_V0.6.0_Organizado.svg) | Desenho das peças da caixa (revisão V0.6.0) |
+| [Incubadora_circuito_didatico_V0.3.0.png](Incubadora_circuito_didatico_V0.3.0.png) | Esquema didático (revisão V0.3.0) |
 
 ## 👥 Créditos
 
@@ -192,6 +206,7 @@ A imagem térmica é só um exemplo: não tem escala de temperatura e não subst
 - Planejamento dos equipamentos: **Willian Barela**, **João Victor Dutra** ([JVSDutra](https://github.com/JVSDutra)) e **Ricardo Michel**.
 - Construção: **João Victor Dutra**, em consulta com Willian e Michel.
 - Fotos em `fotos/`: **Casa Firjan**.
+- Esquema didático no Tinkercad: **João Victor Dutra**.
 
 ## 📄 Licença
 
