@@ -64,13 +64,13 @@ void setup() {
 
 void loop() {
   sensors.requestTemperatures();
+  const float temperaturaAtual = sensors.getTempCByIndex(0);
   // set the cursor to column 0, line 1
   // (note: line 1 is the second row, since counting begins with 0):
   lcd.setCursor(7, 0);
   // print the number of seconds since reset:
-  lcd.print(sensors.getTempCByIndex(0), 2);
+  lcd.print(temperaturaAtual, 2);
 
-  float temperaturaAtual = sensors.getTempCByIndex(0);
 
   int releState = digitalRead(pinoLampada);
 
@@ -80,7 +80,7 @@ void loop() {
       // ATENÇÃO: Se o seu relé liga com HIGH, troque LOW por HIGH e vice-versa aqui e no 'else if'
       digitalWrite(pinoLampada, LOW);
       intensidadeCooler = 255;
-      digitalWrite(cooler, intensidadeCooler);
+      analogWrite(cooler, intensidadeCooler);
       Serial.println("Lâmpada LIGADA (temperatura muito baixa)!");
     } else if (temperaturaAtual >= temperaturaAlvo && releState == LOW) {
       // Se a temperatura estiver acima ou igual ao temperaturaAlvo E a lâmpada estiver ligada,
@@ -111,7 +111,7 @@ void loop() {
   Serial.print(intensidadeCooler);
   Serial.print(", ");
   Serial.print("Temperatura: ");
-  Serial.print(sensors.getTempCByIndex(0), 2);
+  Serial.print(temperaturaAtual, 2);
   Serial.print(", ");
   Serial.print("TemperaturaAlvo: ");
   Serial.println(temperaturaAlvo);

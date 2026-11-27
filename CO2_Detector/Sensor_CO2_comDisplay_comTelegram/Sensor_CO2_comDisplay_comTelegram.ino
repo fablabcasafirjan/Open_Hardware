@@ -20,22 +20,22 @@
 #include <Adafruit_SSD1306.h>
 #include <WiFi.h>
 #include <HTTPClient.h>
+#include "secrets.h"
 
-/Internet
-const char* ssid = "Your_Login_Network";
-const char* password = "Your_network_Password";
+const char* ssid = WIFI_SSID;
+const char* password = WIFI_PASSWORD;
 
-//token do bot in telegram
-const String botToken = "Your_Bot_Token";
+//token do bot
+const char* botToken = TELEGRAM_BOT_TOKEN;
 //id do chat do telegram
-const String chatId = "Your_chat_ID";
+const char* chatId = TELEGRAM_CHAT_ID;
 
 // URL base para a API do Telegram
 const String telegramApiBase = "https://api.telegram.org/bot";
 
 //controlar o tempo de envio da mensagem
 unsigned long lastSendTime = 0; //armazena o tempo da ultima mensagem enviada
-const long sendInterval = 3000; //a cada 30 segundos
+const unsigned long sendInterval = 30000UL; // a cada 30 segundos
 
 #define SCREEN_WIDTH 128  // OLED display width, in pixels
 #define SCREEN_HEIGHT 64  // OLED display height, in pixels
@@ -122,7 +122,7 @@ void setup() {
 
 
 void loop() {
-
+  sensor.co2 = sensor_S8->get_co2();
 
   display.clearDisplay();
   display.setTextSize(1);
@@ -137,19 +137,16 @@ void loop() {
 
   display.display();
 
+  printf("CO2 value = %d ppm\n", sensor.co2);
 
-  sensor.co2 = sensor_S8->get_co2();           // Obtém os valores de concentração de CO2 em ppm
-  printf("CO2 value = %d ppm\n", sensor.co2);  // Mostra a concentração no terminal
-  
   if (millis() - lastSendTime >= sendInterval) {
     lastSendTime = millis();
-    String message = "Sensor de CO2 FabLab! Nível de CO2: " + String(sensor.co2) + "ppm"; //exemplo
+    String message = "Sensor de CO2 FabLab! Nível de CO2: " + String(sensor.co2) + "ppm";
     sendMessageToTelegram(message);
   }
 
-  delay(500);                                  //aguarda a próxima medida
+  delay(500);
 }
-
 void sendMessageToTelegram(String message) {
   if (WiFi.status() == WL_CONNECTED) {  //so vai enviar se o wifi estiver conectado
     HTTPClient http;

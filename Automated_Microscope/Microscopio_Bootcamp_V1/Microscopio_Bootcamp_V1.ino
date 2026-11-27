@@ -15,10 +15,11 @@
 #include "soc/rtc_cntl_reg.h"    // disable brownout problems
 #include "esp_http_server.h"
 #include <ESP32Servo.h>
+#include "secrets.h"
 
 // Replace with your network credentials
-const char* ssid = "AndroidAP";
-const char* password = "fablab123";
+const char* ssid = WIFI_SSID;
+const char* password = WIFI_PASSWORD;
 
 #define PART_BOUNDARY "123456789000000000000987654321"
 
