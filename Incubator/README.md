@@ -192,6 +192,12 @@ A imagem térmica é só um exemplo: não tem escala de temperatura e não subst
 | --- | --- | --- |
 | <img src="Incubator_Closed.jpeg" alt="Incubadora com a porta fechada, LCD e dois botões" width="240"> | <img src="Incubator_Open.jpeg" alt="Incubadora com a porta aberta, mostrando lâmpada, ventilador e prateleiras" width="240"> | <img src="Incubator_ON.jpeg" alt="Interior da incubadora com a lâmpada acesa" width="240"> |
 
+### Em estúdio
+
+|   |   |
+| --- | --- |
+| <img src="fotos/incubadora-estudio-frente.jpg" alt="Incubadora em estúdio, com a lâmpada acesa" width="340"> | <img src="fotos/incubadora-estudio-lateral.jpg" alt="Incubadora em estúdio, em ângulo" width="340"> |
+
 ## 🗂️ Arquivos
 
 | Arquivo | Conteúdo |

@@ -205,6 +205,12 @@ Capturas do modelo 3D:
 | --- | --- |
 | <img src="CO2_Sensor_STL_FrontSide.jpeg" alt="Modelo 3D da caixa vista de frente" width="280"> | <img src="CO2_Sensor_STL_BackSide.jpeg" alt="Modelo 3D da caixa vista por trás" width="280"> |
 
+### Em estúdio
+
+|   |   |
+| --- | --- |
+| <img src="fotos/co2-estudio-frente.jpg" alt="Medidor de CO₂ em estúdio, de frente" width="340"> | <img src="fotos/co2-estudio-lateral.jpg" alt="Medidor de CO₂ em estúdio, em ângulo" width="340"> |
+
 ## 🗂️ Arquivos
 
 | Arquivo | Conteúdo |

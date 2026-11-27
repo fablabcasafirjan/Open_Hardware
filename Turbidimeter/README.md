@@ -108,6 +108,12 @@ Não usa firmware. Não há nada para abrir na Arduino IDE.
 | --- | --- | --- |
 | <img src="Turbidimeter_with_lights_OFF.jpeg" alt="Caixa do turbidímetro com o LED desligado" width="240"> | <img src="Turbidimeter_with_lights_ON.jpeg" alt="Caixa do turbidímetro com o LED vermelho ligado" width="240"> | <img src="Turbidimeter_cam_view.jpeg" alt="Mancha de luz vermelha vista pela câmera" width="240"> |
 
+### Em estúdio
+
+|   |   |
+| --- | --- |
+| <img src="fotos/turbidimetro-estudio-frente.jpg" alt="Turbidímetro em estúdio, com o LED ligado" width="340"> | <img src="fotos/turbidimetro-estudio-lateral.jpg" alt="Turbidímetro em estúdio, em ângulo" width="340"> |
+
 ## 🗂️ Arquivos
 
 - [Turbd_V0.1.0.png](Turbd_V0.1.0.png): imagem de 15118 × 15118 pixels com traços muito claros e algumas marcas vermelhas; parece um desenho de peças, **a confirmar**. Por ser muito grande, não é exibida aqui.

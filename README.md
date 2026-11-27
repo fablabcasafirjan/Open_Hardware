@@ -23,6 +23,10 @@ Quatro protótipos didáticos de hardware aberto desenvolvidos no contexto do bo
 | **Trabalho em grupo** | **Equipe com a incubadora** |
 | <img src="fotos_bootcamp/grupo-trabalhando.jpg" alt="Três participantes de costas trabalhando em uma bancada" width="380"> | <img src="fotos_bootcamp/equipe-com-incubadora.jpg" alt="Equipe ao lado de uma incubadora ligada" width="380"> |
 
+**Os quatro projetos na bancada**
+
+<img src="fotos_bootcamp/quatro-projetos.jpg" alt="Turbidímetro, medidor de CO₂, incubadora e microscópio sobre a mesa, com o notebook mostrando a imagem do microscópio" width="600">
+
 **Apresentação final**
 
 <img src="fotos_bootcamp/apresentacao-final.jpg" alt="Participantes apresentando o projeto sobre potabilidade de água" width="600">

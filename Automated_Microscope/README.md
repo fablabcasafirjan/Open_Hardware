@@ -145,11 +145,35 @@ Não são necessariamente as versões originais.
 
 <img src="fotos/microscopio-vista-superior.jpg" alt="Microscópio visto de cima" width="320">
 
+### 🔬 O que o microscópio enxerga
+
+<img src="fotos/microscopio-imagem-ao-vivo.jpg" alt="Imagem da câmera do microscópio na página ESP32-CAM Pan and Tilt" width="420">
+
+Imagem ao vivo na página servida pela ESP32-CAM, fotografada na tela de um notebook durante o bootcamp. A amostra não está identificada. A [foto da bancada com os quatro projetos](../fotos_bootcamp/quatro-projetos.jpg) mostra a tela inteira.
+
+Outras imagens ampliadas:
+
 | Mosquito | PLA impresso | Impressão digital |
 | --- | --- | --- |
 | <img src="Mosquito_Zoomed_Image.jpeg" alt="Imagem ampliada identificada como mosquito" width="240"> | <img src="PLA_Print_Zoomed_Image.jpeg" alt="Imagem ampliada identificada como peça impressa em PLA" width="240"> | <img src="Fingerprint_Zoomed_Image.jpeg" alt="Imagem ampliada identificada como impressão digital" width="240"> |
 
 As legendas das imagens ampliadas seguem os nomes dos arquivos. Elas têm um botão "Save" sobreposto; as condições de aquisição não estão registradas, e elas não medem resolução óptica.
+
+### Em estúdio
+
+|   |   |   |
+| --- | --- | --- |
+| <img src="fotos/microscopio-estudio-01.jpg" alt="Microscópio fotografado em estúdio, ângulo 1" width="240"> | <img src="fotos/microscopio-estudio-02.jpg" alt="Microscópio fotografado em estúdio, ângulo 2" width="240"> | <img src="fotos/microscopio-estudio-03.jpg" alt="Microscópio fotografado em estúdio, ângulo 3" width="240"> |
+| <img src="fotos/microscopio-estudio-04.jpg" alt="Microscópio fotografado em estúdio, ângulo 4" width="240"> | <img src="fotos/microscopio-estudio-05.jpg" alt="Microscópio fotografado em estúdio, ângulo 5" width="240"> | <img src="fotos/microscopio-estudio-06.jpg" alt="Microscópio fotografado em estúdio, ângulo 6" width="240"> |
+| <img src="fotos/microscopio-estudio-07.jpg" alt="Microscópio fotografado em estúdio, ângulo 7" width="240"> | <img src="fotos/microscopio-estudio-08.jpg" alt="Microscópio fotografado em estúdio, ângulo 8" width="240"> | <img src="fotos/microscopio-estudio-09.jpg" alt="Microscópio fotografado em estúdio, ângulo 9" width="240"> |
+
+### Montagem e bancada
+
+|   |   |   |
+| --- | --- | --- |
+| <img src="fotos/microscopio-montado-lateral.jpg" alt="Microscópio montado visto em ângulo" width="240"> | <img src="fotos/microscopio-na-bancada.jpg" alt="Microscópio na bancada com os fios" width="240"> | <img src="fotos/microscopio-de-cima-2.jpg" alt="Microscópio visto de cima com o conector de alimentação" width="240"> |
+| <img src="fotos/microscopio-porta-lamina.jpg" alt="Detalhe do porta-lâmina preso com elásticos" width="240"> | <img src="fotos/microscopio-caixa-aberta.jpg" alt="Caixa aberta com ESP32-CAM, servo e capacitor" width="240"> | <img src="fotos/microscopio-esp32cam-lente.jpg" alt="ESP32-CAM com o suporte da lente" width="240"> |
+| <img src="fotos/microscopio-ajuste-da-lente.jpg" alt="Mão ajustando a lente sobre a ESP32-CAM" width="240"> | <img src="fotos/microscopio-servos.jpg" alt="Dois microservos sobre a bancada" width="240"> |  |
 
 ## 🗂️ Arquivos
 
