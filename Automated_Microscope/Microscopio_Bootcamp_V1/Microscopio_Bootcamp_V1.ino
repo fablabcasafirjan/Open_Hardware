@@ -1,5 +1,5 @@
 /*********
-  Versão do firmware: 1.0.2
+  Versão do firmware: 1.0.3
 
   Rui Santos & Sara Santos - Random Nerd Tutorials
   Complete instructions at https://RandomNerdTutorials.com/esp32-cam-projects-ebook/
@@ -199,7 +199,7 @@ static const char PROGMEM INDEX_HTML[] = R"rawliteral(
      xhr.open("GET", "/action?go=" + x, true);
      xhr.send();
    }
-   window.onload = document.getElementById("photo").src = window.location.href.slice(0, -1) + ":81/stream";
+   document.getElementById("photo").src = window.location.protocol + "//" + window.location.hostname + ":81/stream";
   </script>
   </body>
 </html>
@@ -228,19 +228,17 @@ static esp_err_t stream_handler(httpd_req_t *req){
       Serial.println("Camera capture failed");
       res = ESP_FAIL;
     } else {
-      if(fb->width > 400){
-        if(fb->format != PIXFORMAT_JPEG){
-          bool jpeg_converted = frame2jpg(fb, 80, &_jpg_buf, &_jpg_buf_len);
-          esp_camera_fb_return(fb);
-          fb = NULL;
-          if(!jpeg_converted){
-            Serial.println("JPEG compression failed");
-            res = ESP_FAIL;
-          }
-        } else {
-          _jpg_buf_len = fb->len;
-          _jpg_buf = fb->buf;
+      if(fb->format != PIXFORMAT_JPEG){
+        bool jpeg_converted = frame2jpg(fb, 80, &_jpg_buf, &_jpg_buf_len);
+        esp_camera_fb_return(fb);
+        fb = NULL;
+        if(!jpeg_converted){
+          Serial.println("JPEG compression failed");
+          res = ESP_FAIL;
         }
+      } else {
+        _jpg_buf_len = fb->len;
+        _jpg_buf = fb->buf;
       }
     }
     if(res == ESP_OK){

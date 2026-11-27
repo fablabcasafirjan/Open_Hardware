@@ -2,9 +2,17 @@
 
 Registra o **firmware**, com numeração própria por projeto no formato [SemVer](https://semver.org/lang/pt-BR/). Nomes como V1, V01, V02, V03 e V06 identificam o projeto físico ou peças e não mudam com o firmware. A versão 1.0.0 corresponde ao sketch original de cada projeto. Não há tags nem releases.
 
-**Verificação:** em 26/11/2026, os quatro sketches nas versões mais recentes abaixo compilaram com arduino-cli, usando os valores de `secrets.h.example`. As versões das ferramentas estão no README de cada projeto. **Nenhum foi testado em placa.**
+**Verificação:** os três sketches nas versões mais recentes abaixo compilaram em 26/11/2026 com arduino-cli, usando os valores de `secrets.h.example`. As versões das ferramentas estão no README de cada projeto. **Nenhum foi testado em placa.**
 
 ## Medidor de CO₂
+
+### 1.1.0 (26/11/2026)
+
+- Na inicialização, mostra no OLED "Tentando conectar ao WiFi" com contagem de 10 a 0 segundos.
+- Sem conexão em 10 segundos, segue para a medição offline; antes, o sketch principal esperava o Wi-Fi sem limite.
+- Passa a existir um único firmware: a pasta `Sensor_CO2_offline` foi removida.
+- O display é iniciado antes do Wi-Fi.
+- As leituras não são armazenadas.
 
 ### 1.0.2 (26/11/2026)
 
@@ -21,6 +29,11 @@ Registra o **firmware**, com numeração própria por projeto no formato [SemVer
 - Atualiza a leitura antes de desenhar a tela.
 
 ## Microscópio automatizado
+
+### 1.0.3 (26/11/2026)
+
+- Monta o endereço do vídeo a partir do nome do servidor, sem depender do formato da URL da página.
+- Remove a condição de largura no fluxo de vídeo que, em resoluções de até 400 pixels, levava a enviar um quadro vazio.
 
 ### 1.0.2 (26/11/2026)
 

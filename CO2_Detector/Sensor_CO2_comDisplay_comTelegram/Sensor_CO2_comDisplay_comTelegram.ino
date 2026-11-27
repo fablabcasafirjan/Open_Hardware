@@ -7,7 +7,7 @@
   S8_UART, by Josep Comas, ver. 1.0.2
 
   ESP32 Dev Module
-  Versão do firmware: 1.0.2
+  Versão do firmware: 1.1.0
 
  *******/
 
@@ -38,6 +38,8 @@ const String telegramApiBase = "https://api.telegram.org/bot";
 unsigned long lastSendTime = 0; //armazena o tempo da ultima mensagem enviada
 const unsigned long sendInterval = 30000UL; // a cada 30 segundos
 
+#define WIFI_TIMEOUT_S 10     // tempo máximo de espera pelo WiFi na inicialização
+
 #define SCREEN_WIDTH 128  // OLED display width, in pixels
 #define SCREEN_HEIGHT 64  // OLED display height, in pixels
 
@@ -59,25 +61,51 @@ S8_UART* sensor_S8;
 S8_sensor sensor;
 EspSoftwareSerial::UART S8_serial;
 
+// Mostra no OLED a contagem regressiva da tentativa de conexão
+void showWifiCountdown(int segundos) {
+  display.clearDisplay();
+  display.setTextColor(SSD1306_WHITE);
+  display.setTextSize(1);
+  display.setCursor(0, 0);
+  display.print("Tentando conectar");
+  display.setCursor(0, 12);
+  display.print("ao WiFi");
+  display.setTextSize(3);
+  display.setCursor(46, 32);
+  display.print(segundos);
+  display.display();
+}
+
 void setup() {
   // inicia a serial do terminal; a do SenseAir S8 é iniciada mais abaixo
   Serial.begin(DEBUG_BAUDRATE);
+
+  // O display é iniciado primeiro para mostrar a contagem de conexão
+  if (!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS)) {
+    Serial.println(F("SSD1306 allocation failed"));
+    for (;;)
+      ;  // Don't proceed, loop forever
+  }
 
   Serial.print("Conectando a ");
   Serial.println(ssid);
   WiFi.begin(ssid, password);
 
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    Serial.print(".");
+  // Tenta por até 10 segundos; depois segue medindo mesmo sem rede
+  for (int restante = WIFI_TIMEOUT_S; restante >= 0 && WiFi.status() != WL_CONNECTED; restante--) {
+    showWifiCountdown(restante);
+    if (restante > 0) delay(1000);
   }
-  Serial.println("");
-  Serial.println("WiFi conectado!");
-  Serial.print("Endereço IP: ");
-  Serial.println(WiFi.localIP());
 
-  // Envia uma mensagem de teste logo após conectar
-  sendMessageToTelegram("ESP32 conectado e pronto!");
+  if (WiFi.status() == WL_CONNECTED) {
+    Serial.println("WiFi conectado!");
+    Serial.print("Endereço IP: ");
+    Serial.println(WiFi.localIP());
+    // Envia uma mensagem de teste logo após conectar
+    sendMessageToTelegram("ESP32 conectado e pronto!");
+  } else {
+    Serial.println("Sem WiFi: medindo offline.");
+  }
 
 
   // Aguarda o início da comunicação com o S8
@@ -99,14 +127,6 @@ void setup() {
     Serial.println("Sensor de CO2 SenseAir S8 não foi encontrado!");
     while (1) { delay(1); };  // pausa para sempre - não sai daqui sem reset
   }
-
-  if (!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS)) {
-    Serial.println(F("SSD1306 allocation failed"));
-    for (;;)
-      ;  // Don't proceed, loop forever
-  }
-  display.display();
-  delay(500);
 
   // Informações iniciais do SenseAir S8
   Serial.println(">>> SenseAir S8 NDIR CO2 sensor <<<");
